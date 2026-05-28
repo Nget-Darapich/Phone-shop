@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:phone_shop/features/home/screens/home_screen.dart';
 import 'package:phone_shop/features/favorites/screens/favorite_screen.dart';
+import 'package:phone_shop/features/more/screens/more_screen.dart';
 
 class AppRouter {
   static const String home = '/';
@@ -9,6 +10,7 @@ class AppRouter {
   static const String profile = '/profile';
   static const String favorite = '/favorite';
   static const String compare = '/compare';
+  static const String more = '/more';
 
   static Route<dynamic> onGenerateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -17,6 +19,9 @@ class AppRouter {
 
       case favorite:
         return MaterialPageRoute(builder: (_) => const FavoriteScreen());
+
+      case more:
+        return MaterialPageRoute(builder: (_) => const MoreScreen());
 
       // case compare:
       //   return MaterialPageRoute(builder: (_) => const CompareScreen());

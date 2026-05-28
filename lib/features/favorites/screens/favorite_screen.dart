@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:phone_shop/core/widgets/custom_bottom_nav.dart';
 
 class FavoriteScreen extends StatelessWidget {
   const FavoriteScreen({super.key});
@@ -16,6 +17,10 @@ class FavoriteScreen extends StatelessWidget {
           "Favorite Screen",
         ),
       ),
+      bottomNavigationBar:
+        CustomBottomNav(
+          selectedIndex:2,
+        ),
     );
   }
 }

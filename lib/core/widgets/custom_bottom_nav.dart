@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import '../router/app_router.dart';
 
 class CustomBottomNav extends StatelessWidget {
@@ -32,9 +33,14 @@ class CustomBottomNav extends StatelessWidget {
               Navigator.pushNamed(context, AppRouter.home);
             },
 
-            icon: Icon(
-              Icons.home,
-              color: selectedIndex == 0 ? Colors.cyan : Colors.grey,
+            icon: SvgPicture.asset(
+              "assets/icons/home_icon.svg",
+              width: 30,
+              height: 30,
+              colorFilter: ColorFilter.mode(
+                selectedIndex == 0 ? Colors.cyan : Colors.grey,
+                BlendMode.srcIn,
+              ),
             ),
           ),
 
@@ -44,9 +50,14 @@ class CustomBottomNav extends StatelessWidget {
               Navigator.pushNamed(context, AppRouter.compare);
             },
 
-            icon: Icon(
-              Icons.compare,
-              color: selectedIndex == 1 ? Colors.cyan : Colors.grey,
+            icon: SvgPicture.asset(
+              "assets/icons/compare_icon.svg",
+              width: 20,
+              height: 20,
+              colorFilter: ColorFilter.mode(
+                selectedIndex == 1 ? Colors.cyan : Colors.grey,
+                BlendMode.srcIn,
+              ),
             ),
           ),
 
@@ -56,9 +67,14 @@ class CustomBottomNav extends StatelessWidget {
               Navigator.pushNamed(context, AppRouter.favorite);
             },
 
-            icon: Icon(
-              Icons.favorite,
-              color: selectedIndex == 2 ? Colors.cyan : Colors.grey,
+            icon: SvgPicture.asset(
+              "assets/icons/favorite_icon.svg",
+              width: 20,
+              height: 20,
+              colorFilter: ColorFilter.mode(
+                selectedIndex == 2 ? Colors.cyan : Colors.grey,
+                BlendMode.srcIn,
+              ),
             ),
           ),
 
@@ -68,9 +84,14 @@ class CustomBottomNav extends StatelessWidget {
               Navigator.pushNamed(context, AppRouter.cart);
             },
 
-            icon: Icon(
-              Icons.shopping_cart,
-              color: selectedIndex == 3 ? Colors.cyan : Colors.grey,
+            icon: SvgPicture.asset(
+              "assets/icons/cart_icon.svg",
+              width: 20,
+              height: 20,
+              colorFilter: ColorFilter.mode(
+                selectedIndex == 3 ? Colors.cyan : Colors.grey,
+                BlendMode.srcIn,
+              ),
             ),
           ),
 
@@ -80,9 +101,14 @@ class CustomBottomNav extends StatelessWidget {
               Navigator.pushNamed(context, AppRouter.profile);
             },
 
-            icon: Icon(
-              Icons.person,
-              color: selectedIndex == 4 ? Colors.cyan : Colors.grey,
+            icon: SvgPicture.asset(
+              "assets/icons/more_icon.svg",
+              width: 20,
+              height: 20,
+              colorFilter: ColorFilter.mode(
+                selectedIndex == 4 ? Colors.cyan : Colors.grey,
+                BlendMode.srcIn,
+              ),
             ),
           ),
         ],

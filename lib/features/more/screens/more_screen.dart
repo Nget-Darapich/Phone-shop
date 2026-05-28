@@ -74,7 +74,7 @@ class MoreScreen extends StatelessWidget {
                       ),
                       child: const Center(
                         child: Text(
-                          'JD',
+                          'KD',
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 24,
@@ -88,7 +88,7 @@ class MoreScreen extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'John Doe',
+                          'KAKDA',
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 18,
@@ -97,7 +97,7 @@ class MoreScreen extends StatelessWidget {
                         ),
                         SizedBox(height: 4),
                         Text(
-                          'john.doe@example.com',
+                          'kakda@example.com',
                           style: TextStyle(
                             color: Colors.grey,
                             fontSize: 14,
@@ -159,25 +159,29 @@ class MoreScreen extends StatelessWidget {
         color: const Color(0xFF1E293B),
         borderRadius: BorderRadius.circular(12),
       ),
-      child: ListTile(
-        leading: Image.asset(
-          iconPath,
-          width: 24,
-          height: 24,
-          errorBuilder: (context, error, stackTrace) {
-            return const Icon(Icons.error_outline, color: Colors.grey);
-          },
+      child: Material(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(12),
+        child: ListTile(
+          leading: Image.asset(
+            iconPath,
+            width: 24,
+            height: 24,
+            errorBuilder: (context, error, stackTrace) {
+              return const Icon(Icons.error_outline, color: Colors.grey);
+            },
+          ),
+          title: Text(
+            title,
+            style: const TextStyle(color: Colors.white, fontSize: 16),
+          ),
+          trailing: const Icon(
+            Icons.arrow_forward_ios,
+            color: Colors.grey,
+            size: 16,
+          ),
+          onTap: onTap,
         ),
-        title: Text(
-          title,
-          style: const TextStyle(color: Colors.white, fontSize: 16),
-        ),
-        trailing: const Icon(
-          Icons.arrow_forward_ios,
-          color: Colors.grey,
-          size: 16,
-        ),
-        onTap: onTap,
       ),
     );
   }

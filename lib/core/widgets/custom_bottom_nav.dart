@@ -74,14 +74,14 @@ class CustomBottomNav extends StatelessWidget {
             ),
           ),
 
-          // Profile
+          // Profile/More
           IconButton(
             onPressed: () {
-              Navigator.pushNamed(context, AppRouter.profile);
+              Navigator.pushNamed(context, AppRouter.more);
             },
 
             icon: Icon(
-              Icons.person,
+              Icons.menu,
               color: selectedIndex == 4 ? Colors.cyan : Colors.grey,
             ),
           ),

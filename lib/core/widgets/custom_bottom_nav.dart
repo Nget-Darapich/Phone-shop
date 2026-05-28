@@ -95,10 +95,10 @@ class CustomBottomNav extends StatelessWidget {
             ),
           ),
 
-          // Profile
+          // Profile/More
           IconButton(
             onPressed: () {
-              Navigator.pushNamed(context, AppRouter.profile);
+              Navigator.pushNamed(context, AppRouter.more);
             },
 
             icon: SvgPicture.asset(

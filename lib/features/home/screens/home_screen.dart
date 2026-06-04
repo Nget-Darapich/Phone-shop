@@ -27,10 +27,10 @@ class HomeScreen extends StatelessWidget {
 
             children: [
               HeroBanner(
-                imagePath: "assets/images/hero_banner.jpg",
-                title: "Discover the Latest Phones",
+                imagePath: "assets/images/hero_banner.png",
+                title: "Latest Phones",
                 subtitle:
-                    "Explore our wide range of smartphones and find the perfect one for you.",
+                    "Titanium. So strong. So light.",
               ),
 
               SizedBox(height: 30),

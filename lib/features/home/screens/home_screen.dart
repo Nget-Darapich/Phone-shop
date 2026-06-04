@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 
 import '../../../core/widgets/custom_appbar.dart';
 import '../../../core/widgets/custom_bottom_nav.dart';
+import '../../../data/models/phone_model.dart';
 import '../widgets/hero_banner.dart';
+import '../widgets/product_card.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -40,11 +42,44 @@ class HomeScreen extends StatelessWidget {
               //BrandCircle(),
               SizedBox(height: 30),
 
-              Text("New Arrivals"),
-
-              SizedBox(height: 20),
-
               //ProductCard(),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'New Arrivals',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  Text(
+                    'See All',
+                    style: TextStyle(
+                      color: const Color(0xFF38BDF8),
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+ 
+              const SizedBox(height: 16),
+ 
+              // Horizontal scroll of ProductCards
+              SizedBox(
+                height: 290,
+                child: ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: samplePhones.length,
+                  separatorBuilder: (_, _) => const SizedBox(width: 14),
+                  itemBuilder: (context, i) =>
+                      ProductCard(phone: samplePhones[i]),
+                ),
+              ),
+ 
+              const SizedBox(height: 30),
             ],
           ),
         ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:phone_shop/features/home/screens/home_screen.dart';
 import 'package:phone_shop/features/favorites/screens/favorite_screen.dart';
 import 'package:phone_shop/features/more/screens/more_screen.dart';
+import 'package:phone_shop/features/product/screens/product_detail_screen.dart';
 
 class AppRouter {
   static const String home = '/';
@@ -17,6 +18,12 @@ class AppRouter {
       case home:
         return MaterialPageRoute(builder: (_) => const HomeScreen());
 
+      case product:
+        return MaterialPageRoute(
+          builder: (_) => const ProductDetailScreen(),
+          settings: settings, 
+        );
+        
       case favorite:
         return MaterialPageRoute(builder: (_) => const FavoriteScreen());
 

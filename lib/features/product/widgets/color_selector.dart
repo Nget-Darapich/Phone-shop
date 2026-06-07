@@ -56,13 +56,13 @@ class ColorSelector extends StatelessWidget {
                 border: Border.all(
                   color: selected
                       ? const Color(0xFF38BDF8)
-                      : Colors.white.withValues(alpha: 0.12),
+                      : Color.fromRGBO(255, 255, 255, 0.12),
                   width: selected ? 2.5 : 1.5,
                 ),
                 boxShadow: selected
                     ? [
                         BoxShadow(
-                          color: const Color(0xFF38BDF8).withValues(alpha: 0.45),
+                          color: Color.fromRGBO(56, 189, 248, 0.45),
                           blurRadius: 8,
                           spreadRadius: 1,
                         )

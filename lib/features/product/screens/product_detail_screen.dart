@@ -46,7 +46,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     child: Container(
                       margin: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: Colors.black.withValues(alpha: 0.35),
+                        color: Color.fromRGBO(0, 0, 0, 0.35),
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(Icons.arrow_back_ios_new_rounded,
@@ -82,19 +82,19 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         ),
                         // Gradient overlay so appbar blends
                         Container(
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              begin: Alignment.topCenter,
-                              end: Alignment.bottomCenter,
-                              colors: [
-                                Colors.black.withValues(alpha: 0.4),
-                                Colors.transparent,
-                                Colors.transparent,
-                                _bg.withValues(alpha: 0.9),
-                              ],
-                              stops: const [0.0, 0.3, 0.6, 1.0],
-                            ),
-                          ),
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  begin: Alignment.topCenter,
+                                  end: Alignment.bottomCenter,
+                                  colors: [
+                                    Color.fromRGBO(0, 0, 0, 0.4),
+                                    Colors.transparent,
+                                    Colors.transparent,
+                                    Color.fromRGBO(2, 6, 23, 0.9),
+                                  ],
+                                  stops: const [0.0, 0.3, 0.6, 1.0],
+                                ),
+                              ),
                         ),
                         // Favourite + Share overlaid on image
                         Positioned(
@@ -173,7 +173,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                             Text(
                               '${phone.reviewCount} reviews',
                               style: TextStyle(
-                                  color: Colors.white.withValues(alpha: 0.45),
+                                  color: Color.fromRGBO(255, 255, 255, 0.45),
                                   fontSize: 13),
                             ),
                           ],
@@ -188,7 +188,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                             color: _surface,
                             borderRadius: BorderRadius.circular(14),
                             border: Border.all(
-                                color: Colors.white.withValues(alpha: 0.07)),
+                              color: Color.fromRGBO(255, 255, 255, 0.07)),
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -222,7 +222,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                   Text(
                                     'or \$${phone.monthlyPrice.toStringAsFixed(2)}/mo for ${phone.monthlyDuration} mos.',
                                     style: TextStyle(
-                                      color: Colors.white.withValues(alpha: 0.5),
+                                      color: Color.fromRGBO(255, 255, 255, 0.5),
                                       fontSize: 12,
                                     ),
                                   ),
@@ -326,10 +326,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             padding: EdgeInsets.fromLTRB(
                 20, 14, 20, MediaQuery.of(context).padding.bottom + 14),
             decoration: BoxDecoration(
-              color: _surface,
-              border:
-                  Border(top: BorderSide(color: Colors.white.withValues(alpha: 0.07))),
-            ),
+          color: _surface,
+          border: Border(top: BorderSide(color: Color.fromRGBO(255, 255, 255, 0.07))),
+        ),
             child: Row(
               children: [
                 // Reserve in Store
@@ -338,7 +337,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     onPressed: () {},
                     style: OutlinedButton.styleFrom(
                       foregroundColor: Colors.white,
-                      side: BorderSide(color: Colors.white.withValues(alpha: 0.2)),
+                      side: BorderSide(color: Color.fromRGBO(255, 255, 255, 0.2)),
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(14)),
@@ -390,7 +389,7 @@ class _AppBarIcon extends StatelessWidget {
         margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
         padding: const EdgeInsets.all(6),
         decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.08),
+          color: Color.fromRGBO(255, 255, 255, 0.08),
           shape: BoxShape.circle,
         ),
         child: Icon(icon, color: Colors.white, size: 18),
@@ -419,7 +418,7 @@ class _RoundedActionButton extends StatelessWidget {
         width: 38,
         height: 38,
         decoration: BoxDecoration(
-          color: Colors.black.withValues(alpha: 0.35),
+          color: Color.fromRGBO(0, 0, 0, 0.35),
           shape: BoxShape.circle,
         ),
         child: Icon(icon, color: iconColor, size: 20),
@@ -442,7 +441,7 @@ class _FeatureCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: const Color(0xFF0F172A),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.white.withValues(alpha: 0.07)),
+          border: Border.all(color: Color.fromRGBO(255, 255, 255, 0.07)),
         ),
         child: Column(
           children: [
@@ -452,9 +451,9 @@ class _FeatureCard extends StatelessWidget {
               label,
               textAlign: TextAlign.center,
               style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.65),
-                  fontSize: 11,
-                  height: 1.4),
+                color: Color.fromRGBO(255, 255, 255, 0.65),
+                fontSize: 11,
+                height: 1.4),
             ),
           ],
         ),

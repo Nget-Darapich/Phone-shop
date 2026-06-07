@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../core/widgets/custom_bottom_nav.dart';
+import '../../../core/router/app_router.dart';
 
 class MoreScreen extends StatelessWidget {
   const MoreScreen({super.key});
@@ -119,12 +120,17 @@ class MoreScreen extends StatelessWidget {
               _buildMenuItem(
                 iconPath: 'assets/icons/Nearby_Stock_icon.png',
                 title: 'Nearby Stock',
-                onTap: () {},
+                onTap: () { Navigator.of(context).pushNamed(AppRouter.nearbyStock); },
+              ),
+              _buildMenuItem(
+                iconPath: 'assets/icons/Repair_icon.png',
+                title: 'Repair Tracker',
+                onTap: () { Navigator.of(context).pushNamed(AppRouter.repairTracker); },
               ),
               _buildMenuItem(
                 iconPath: 'assets/icons/Promotions_icon.png',
                 title: 'Promotions',
-                onTap: () {},
+                onTap: () { Navigator.of(context).pushNamed(AppRouter.promotions); },
               ),
               _buildMenuItem(
                 iconPath: 'assets/icons/Book_icon.png',
@@ -139,7 +145,7 @@ class MoreScreen extends StatelessWidget {
               _buildMenuItem(
                 iconPath: 'assets/icons/Reviews_icon.png',
                 title: 'Reviews',
-                onTap: () {},
+                onTap: () { Navigator.of(context).pushNamed(AppRouter.reviews); },
               ),
             ],
           ),

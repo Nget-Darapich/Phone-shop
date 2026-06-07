@@ -26,20 +26,20 @@ class StorageSelector extends StatelessWidget {
             duration: const Duration(milliseconds: 200),
             padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
             decoration: BoxDecoration(
-              color: selected
-                  ? const Color(0xFF38BDF8).withValues(alpha: 0.15)
+                color: selected
+                  ? Color.fromRGBO(56, 189, 248, 0.15)
                   : const Color(0xFF1E293B),
               borderRadius: BorderRadius.circular(10),
               border: Border.all(
                 color: selected
-                    ? const Color(0xFF38BDF8)
-                    : Colors.white.withValues(alpha: 0.1),
+                  ? const Color(0xFF38BDF8)
+                  : Color.fromRGBO(255, 255, 255, 0.1),
                 width: selected ? 1.5 : 1,
               ),
               boxShadow: selected
                   ? [
                       BoxShadow(
-                        color: const Color(0xFF38BDF8).withValues(alpha: 0.2),
+                        color: Color.fromRGBO(56, 189, 248, 0.2),
                         blurRadius: 8,
                       )
                     ]

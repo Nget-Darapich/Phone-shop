@@ -4,6 +4,8 @@ import '../../../core/widgets/custom_bottom_nav.dart';
 import '../../../data/models/phone_model.dart';
 import '../widgets/hero_banner.dart';
 import '../widgets/product_card.dart';
+import '../widgets/brand_card.dart';
+import '../widgets/category_card.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -19,6 +21,67 @@ class HomeScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              HeroBanner(
+                imagePath: "assets/images/hero_banner.png",
+                title: "Latest Phones",
+                subtitle: "Titanium. So strong. So light.",
+              ),
+
+              SizedBox(height: 30),
+
+              const Text(
+                "Top Brands",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+
+              const SizedBox(height: 20),
+
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  BrandCircle(
+                    brand: "Apple",
+                    onTap: () {
+                      print("Apple clicked");
+                    },
+                  ),
+
+                  BrandCircle(brand: "Samsung", onTap: () {}),
+
+                  BrandCircle(brand: "Xiaomi", onTap: () {}),
+
+                  BrandCircle(brand: "Oppo", onTap: () {}),
+                ],
+              ),
+              // SizedBox(height: 30),
+              const SizedBox(height: 40),
+
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+
+                children: const [
+                  CategoryCard(icon: Icons.phone_android, title: "Phones"),
+
+                  CategoryCard(icon: Icons.tablet_android, title: "Tablets"),
+
+                  CategoryCard(icon: Icons.watch, title: "Wearables"),
+
+                  CategoryCard(icon: Icons.headphones, title: "Accessories"),
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'New Arrivals',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
               // ── Hero banner ──────────────────────────────────────
               Padding(
                 padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
@@ -78,6 +141,7 @@ class HomeScreen extends StatelessWidget {
 
               const SizedBox(height: 16),
 
+              // Horizontal scroll of ProductCards
               // ── Product card list — no horizontal padding so cards
               //    bleed to the edge and the ListView gets full width ──
               SizedBox(

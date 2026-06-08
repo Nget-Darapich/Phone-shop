@@ -21,7 +21,7 @@ class ProductCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: const Color(0xFF0F172A),
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: Colors.white.withValues(alpha: 0.07)),
+          border: Border.all(color: Color.fromRGBO(255, 255, 255, 0.07)),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -85,8 +85,8 @@ class ProductCard extends StatelessWidget {
                   const SizedBox(height: 3),
                   Text(
                     phone.brand,
-                    style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.45), fontSize: 12),
+                      style: TextStyle(
+                          color: Color.fromRGBO(255, 255, 255, 0.45), fontSize: 12),
                   ),
                   const SizedBox(height: 12),
                   Row(
@@ -140,8 +140,8 @@ class _NewBadge extends StatelessWidget {
         ),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
-          BoxShadow(
-              color: const Color(0xFF0EA5E9).withValues(alpha: 0.4),
+            BoxShadow(
+              color: Color.fromRGBO(14, 165, 233, 0.4),
               blurRadius: 8,
               offset: const Offset(0, 2)),
         ],
@@ -170,7 +170,7 @@ class _CircleIcon extends StatelessWidget {
         width: 32,
         height: 32,
         decoration: BoxDecoration(
-          color: Colors.black.withValues(alpha: 0.35),
+          color: Color.fromRGBO(0, 0, 0, 0.35),
           shape: BoxShape.circle,
         ),
         child: Icon(icon, color: Colors.white, size: 17),

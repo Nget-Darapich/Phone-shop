@@ -57,7 +57,7 @@ class _SpecificationTileState extends State<SpecificationTile>
       decoration: BoxDecoration(
         color: const Color(0xFF0F172A),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.07)),
+        border: Border.all(color: Color.fromRGBO(255, 255, 255, 0.07)),
       ),
       child: Column(
         children: [
@@ -97,9 +97,9 @@ class _SpecificationTileState extends State<SpecificationTile>
               child: Text(
                 widget.content,
                 style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.55),
-                    fontSize: 13,
-                    height: 1.6),
+                  color: Color.fromRGBO(255, 255, 255, 0.55),
+                  fontSize: 13,
+                  height: 1.6),
               ),
             ),
           ),

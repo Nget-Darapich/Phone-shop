@@ -114,8 +114,13 @@ class MoreScreen extends StatelessWidget {
               // Menu Items
               _buildMenuItem(
                 iconPath: 'assets/icons/map_icon.png',
-                title: 'Store Map',
-                onTap: () {},
+                title: 'Store Locator',
+                onTap: () { Navigator.of(context).pushNamed(AppRouter.storeLocator); },
+              ),
+              _buildMenuItem(
+                iconPath: 'assets/icons/Promotions_icon.png',
+                title: 'Media Review',
+                onTap: () { Navigator.of(context).pushNamed(AppRouter.mediaReview); },
               ),
               _buildMenuItem(
                 iconPath: 'assets/icons/Nearby_Stock_icon.png',
@@ -123,7 +128,7 @@ class MoreScreen extends StatelessWidget {
                 onTap: () { Navigator.of(context).pushNamed(AppRouter.nearbyStock); },
               ),
               _buildMenuItem(
-                iconPath: 'assets/icons/Repair_icon.png',
+                iconPath: 'assets/icons/map_icon.png',
                 title: 'Repair Tracker',
                 onTap: () { Navigator.of(context).pushNamed(AppRouter.repairTracker); },
               ),
@@ -135,12 +140,12 @@ class MoreScreen extends StatelessWidget {
               _buildMenuItem(
                 iconPath: 'assets/icons/Book_icon.png',
                 title: 'Book Appointment',
-                onTap: () {},
+                onTap: () { Navigator.of(context).pushNamed(AppRouter.bookAppointment); },
               ),
               _buildMenuItem(
                 iconPath: 'assets/icons/Support_Chat_icon.png',
                 title: 'Support Chat',
-                onTap: () {},
+                onTap: () { Navigator.of(context).pushNamed(AppRouter.supportChat); },
               ),
               _buildMenuItem(
                 iconPath: 'assets/icons/Reviews_icon.png',

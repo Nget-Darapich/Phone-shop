@@ -6,6 +6,10 @@ import '../../features/more/screens/nearby_stock_screen.dart';
 import 'package:phone_shop/features/more/screens/promotions_screen.dart' as promos;
 import 'package:phone_shop/features/more/screens/repair_tracker_screen.dart';
 import 'package:phone_shop/features/more/screens/reviews_screen.dart';
+import 'package:phone_shop/features/more/screens/book_appointment_screen.dart';
+import 'package:phone_shop/features/more/screens/support_chat_screen.dart';
+import 'package:phone_shop/features/more/screens/store_locator_screen.dart';
+import 'package:phone_shop/features/more/screens/media_review_screen.dart';
 import 'package:phone_shop/features/cart/screens/cart_screen.dart';
 import 'package:phone_shop/features/product/screens/product_detail_screen.dart';
 
@@ -21,6 +25,10 @@ class AppRouter {
   static const String promotions = '/promotions';
   static const String repairTracker = '/repair_tracker';
   static const String reviews = '/reviews';
+  static const String storeLocator = '/store_locator';
+  static const String mediaReview = '/media_review';
+  static const String bookAppointment = '/book_appointment';
+  static const String supportChat = '/support_chat';
 
   static Route<dynamic> onGenerateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -53,6 +61,18 @@ class AppRouter {
 
       case reviews:
         return MaterialPageRoute(builder: (_) => const ReviewsScreen());
+
+      case storeLocator:
+        return MaterialPageRoute(builder: (_) => const StoreLocatorScreen());
+
+      case mediaReview:
+        return MaterialPageRoute(builder: (_) => const MediaReviewScreen());
+
+      case bookAppointment:
+        return MaterialPageRoute(builder: (_) => const BookAppointmentScreen());
+
+      case supportChat:
+        return MaterialPageRoute(builder: (_) => const SupportChatScreen());
 
       // case compare:
       //   return MaterialPageRoute(builder: (_) => const CompareScreen());

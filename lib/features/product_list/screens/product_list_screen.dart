@@ -4,16 +4,25 @@ import 'package:phone_shop/data/models/product_model.dart';
 class ProductListFilter {
   final ProductBrand? brand;
   final ProductCategory? category;
+  final bool isNewArrivals; 
 
   const ProductListFilter.byBrand(ProductBrand b)
       : brand = b,
-        category = null;
+        category = null,
+        isNewArrivals = false;
 
   const ProductListFilter.byCategory(ProductCategory c)
       : brand = null,
-        category = c;
+        category = c,
+        isNewArrivals = false;
+
+  const ProductListFilter.newArrivals()
+      : brand = null,
+        category = null,
+        isNewArrivals = true;
 
   String get title {
+    if (isNewArrivals) return 'New Arrivals'; 
     if (brand != null) {
       final name = brand!.name;
       return name[0].toUpperCase() + name.substring(1);
@@ -31,6 +40,9 @@ class ProductListFilter {
   }
 
   List<ProductModel> apply(List<ProductModel> all) {
+    if (isNewArrivals) {
+      return all.where((p) => p.isNew).toList(); 
+    }
     if (brand != null) {
       return all.where((p) => p.brand == brand).toList();
     }
@@ -106,7 +118,7 @@ class _ProductGridCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Formatting brand name beautifully (e.g., apple -> Apple)
+        // Formatting brand name beautifully (e.g., apple -> Apple)
     final brandName = product.brand.name[0].toUpperCase() + product.brand.name.substring(1);
 
     return GestureDetector(
@@ -235,7 +247,7 @@ class _EmptyState extends StatelessWidget {
               color: Color(0xFF94A3B8),
               fontSize: 16,
               fontWeight: FontWeight.w600,
-          ),
+            ),
           ),
           const SizedBox(height: 8),
           const Text(

@@ -349,8 +349,8 @@ class HomeScreen extends StatelessWidget {
               /// NEW ARRIVALS HEADER
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: const [
-                  Text(
+                children: [
+                  const Text(
                     'New Arrivals',
                     style: TextStyle(
                       color: Colors.white,
@@ -358,13 +358,22 @@ class HomeScreen extends StatelessWidget {
                       fontWeight: FontWeight.w700,
                     ),
                   ),
-
-                  Text(
-                    'See All',
-                    style: TextStyle(
-                      color: Color(0xFF38BDF8),
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
+                  
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.pushNamed(
+                        context,
+                        '/product_list',
+                        arguments: const ProductListFilter.newArrivals(),
+                      );
+                    },
+                    child: const Text(
+                      'See All',
+                      style: TextStyle(
+                        color: Color(0xFF38BDF8),
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                 ],

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/widgets/custom_bottom_nav.dart';
-import '../../../data/models/phone_model.dart';
+import '../../../data/models/product_model.dart';
 import '../widgets/color_selector.dart';
 import '../widgets/storage_selector.dart';
 import '../widgets/specification_tile.dart';
@@ -24,9 +24,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Receive PhoneModel passed via Navigator arguments
-    final phone =
-        ModalRoute.of(context)!.settings.arguments as PhoneModel;
+    // Receive ProductModel passed via Navigator arguments
+    final product =
+        ModalRoute.of(context)!.settings.arguments as ProductModel;
 
     return Scaffold(
       backgroundColor: _bg,
@@ -67,13 +67,13 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         onTap: () {}),
                     _AppBarIcon(Icons.wb_sunny_outlined, onTap: () {}),
                     const SizedBox(width: 8),
-                  ],
+                ],
                   flexibleSpace: FlexibleSpaceBar(
                     background: Stack(
                       fit: StackFit.expand,
                       children: [
                         Image.asset(
-                          phone.image,
+                          product.image,
                           fit: BoxFit.cover,
                           errorBuilder: (_, _, _) => Container(
                             color: _surface,
@@ -137,7 +137,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       children: [
                         // Brand name (accent colour)
                         Text(
-                          phone.brand,
+                          product.brand.toString().split('.').last,
                           style: const TextStyle(
                               color: _accent,
                               fontSize: 13,
@@ -148,7 +148,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
                         // Product name
                         Text(
-                          phone.name,
+                          product.name,
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 24,
@@ -164,7 +164,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                 color: Color(0xFFFBBF24), size: 18),
                             const SizedBox(width: 4),
                             Text(
-                              phone.rating.toString(),
+                              product.rating.toString(),
                               style: const TextStyle(
                                   color: Color(0xFFFBBF24),
                                   fontSize: 14,
@@ -172,7 +172,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                             ),
                             const SizedBox(width: 8),
                             Text(
-                              '${phone.reviewCount} reviews',
+                              '${product.reviewCount} reviews',
                               style: TextStyle(
                                   color: Color.fromRGBO(255, 255, 255, 0.45),
                                   fontSize: 13),
@@ -213,7 +213,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
-                                    '\$${phone.price.toStringAsFixed(0)}',
+                                    '\$${product.price.toStringAsFixed(0)}',
                                     style: const TextStyle(
                                       color: Colors.white,
                                       fontSize: 26,
@@ -221,7 +221,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                     ),
                                   ),
                                   Text(
-                                    'or \$${phone.monthlyPrice.toStringAsFixed(2)}/mo for ${phone.monthlyDuration} mos.',
+                                    'or \$${product.monthlyPrice.toStringAsFixed(2)}/mo for ${product.monthlyDuration} mos.',
                                     style: TextStyle(
                                       color: Color.fromRGBO(255, 255, 255, 0.5),
                                       fontSize: 12,
@@ -237,7 +237,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
                         // ── Color selector ─────────────────────
                         Text(
-                          'Color - ${phone.colors[_selectedColor]}',
+                          'Color - ${product.colors[_selectedColor]}',
                           style: const TextStyle(
                               color: Colors.white,
                               fontSize: 15,
@@ -245,7 +245,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         ),
                         const SizedBox(height: 12),
                         ColorSelector(
-                          colors: phone.colors,
+                          colors: product.colors,
                           selectedIndex: _selectedColor,
                           onSelected: (i) =>
                               setState(() => _selectedColor = i),
@@ -263,7 +263,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         ),
                         const SizedBox(height: 12),
                         StorageSelector(
-                          options: phone.storage,
+                          options: product.storage,
                           selectedIndex: _selectedStorage,
                           onSelected: (i) =>
                               setState(() => _selectedStorage = i),
@@ -296,21 +296,21 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         // ── Specification tiles ─────────────────
                         SpecificationTile(
                           title: 'Display',
-                          content: phone.displaySpec,
+                          content: product.displaySpec,
                           initiallyExpanded: true,
                         ),
                         SpecificationTile(
                           title: 'Camera',
-                          content: phone.cameraSpec,
+                          content: product.cameraSpec,
                         ),
                         SpecificationTile(
                           title: 'Processor & Battery',
                           content:
-                              '${phone.processorSpec}\n${phone.batterySpec}',
+                              '${product.processorSpec}\n${product.batterySpec}',
                         ),
                         SpecificationTile(
                           title: 'Connectivity',
-                          content: phone.connectivitySpec,
+                          content: product.connectivitySpec,
                         ),
 
                         const SizedBox(height: 100), // space above CTA bar
@@ -355,7 +355,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     onPressed: () => Navigator.pushNamed(
                       context,
                       AppRouter.checkout,
-                      arguments: phone.price,
+                      arguments: product.price,
                     ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: _accent,

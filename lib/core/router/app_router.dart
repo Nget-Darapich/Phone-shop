@@ -13,9 +13,12 @@ import 'package:phone_shop/features/more/screens/media_review_screen.dart';
 import 'package:phone_shop/features/cart/screens/cart_screen.dart';
 import 'package:phone_shop/features/product/screens/product_detail_screen.dart';
 import 'package:phone_shop/features/checkout/screens/checkout_screen.dart';
+import 'package:phone_shop/features/product_list/screens/product_list_screen.dart';
+
 class AppRouter {
   static const String home = '/';
   static const String product = '/product';
+  static const String productList = '/product_list';
   static const String checkout = '/checkout';
   static const String cart = '/cart';
   static const String profile = '/profile';
@@ -39,13 +42,19 @@ class AppRouter {
       case product:
         return MaterialPageRoute(
           builder: (_) => const ProductDetailScreen(),
-          settings: settings, 
+          settings: settings,
         );
-      
+        
+      case productList:
+        final filter = settings.arguments as ProductListFilter;
+        return MaterialPageRoute(
+          builder: (_) => ProductListScreen(filter: filter),
+        );
+
       case checkout:
         return MaterialPageRoute(
           builder: (_) => const CheckoutScreen(),
-          settings: settings, 
+          settings: settings,
         );
 
       case favorite:

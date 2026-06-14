@@ -168,7 +168,8 @@ import 'package:flutter/material.dart';
 
 import '../../../core/widgets/custom_appbar.dart';
 import '../../../core/widgets/custom_bottom_nav.dart';
-import '../../../data/models/phone_model.dart';
+import '../../../data/models/product_model.dart';
+import '../../product_list/screens/product_list_screen.dart';
 import '../widgets/brand_card.dart';
 import '../widgets/category_card.dart';
 import '../widgets/hero_banner.dart';
@@ -222,7 +223,11 @@ class HomeScreen extends StatelessWidget {
                     BrandCircle(
                       brand: "Apple",
                       onTap: () {
-                        print("Apple clicked");
+                        Navigator.pushNamed(
+                          context,
+                          '/product_list',
+                          arguments: const ProductListFilter.byBrand(ProductBrand.apple),
+                        );
                       },
                     ),
 
@@ -231,7 +236,11 @@ class HomeScreen extends StatelessWidget {
                     BrandCircle(
                       brand: "Samsung",
                       onTap: () {
-                        print("Samsung clicked");
+                        Navigator.pushNamed(
+                          context,
+                          '/product_list',
+                          arguments: const ProductListFilter.byBrand(ProductBrand.samsung),
+                        );
                       },
                     ),
 
@@ -240,7 +249,11 @@ class HomeScreen extends StatelessWidget {
                     BrandCircle(
                       brand: "Xiaomi",
                       onTap: () {
-                        print("Xiaomi clicked");
+                        Navigator.pushNamed(
+                          context,
+                          '/product_list',
+                          arguments: const ProductListFilter.byBrand(ProductBrand.xiaomi),
+                        );
                       },
                     ),
 
@@ -249,7 +262,11 @@ class HomeScreen extends StatelessWidget {
                     BrandCircle(
                       brand: "Oppo",
                       onTap: () {
-                        print("Oppo clicked");
+                        Navigator.pushNamed(
+                          context,
+                          '/product_list',
+                          arguments: const ProductListFilter.byBrand(ProductBrand.oppo),
+                        );
                       },
                     ),
                   ],
@@ -273,20 +290,56 @@ class HomeScreen extends StatelessWidget {
               SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: Row(
-                  children: const [
-                    CategoryCard(icon: Icons.phone_android, title: "Phones"),
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.pushNamed(
+                          context,
+                          '/product_list',
+                          arguments: const ProductListFilter.byCategory(ProductCategory.phones),
+                        );
+                      },
+                      child: const CategoryCard(icon: Icons.phone_android, title: "Phones"),
+                    ),
 
-                    SizedBox(width: 16),
+                    const SizedBox(width: 16),
 
-                    CategoryCard(icon: Icons.tablet_android, title: "Tablets"),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.pushNamed(
+                          context,
+                          '/product_list',
+                          arguments: const ProductListFilter.byCategory(ProductCategory.tablets),
+                        );
+                      },
+                      child: const CategoryCard(icon: Icons.tablet_android, title: "Tablets"),
+                    ),
 
-                    SizedBox(width: 16),
+                    const SizedBox(width: 16),
 
-                    CategoryCard(icon: Icons.watch, title: "Wearables"),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.pushNamed(
+                          context,
+                          '/product_list',
+                          arguments: const ProductListFilter.byCategory(ProductCategory.wearables),
+                        );
+                      },
+                      child: const CategoryCard(icon: Icons.watch, title: "Wearables"),
+                    ),
 
-                    SizedBox(width: 16),
+                    const SizedBox(width: 16),
 
-                    CategoryCard(icon: Icons.headphones, title: "Accessories"),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.pushNamed(
+                          context,
+                          '/product_list',
+                          arguments: const ProductListFilter.byCategory(ProductCategory.accessories),
+                        );
+                      },
+                      child: const CategoryCard(icon: Icons.headphones, title: "Accessories"),
+                    ),
                   ],
                 ),
               ),
@@ -324,10 +377,12 @@ class HomeScreen extends StatelessWidget {
                 height: 290,
                 child: ListView.separated(
                   scrollDirection: Axis.horizontal,
-                  itemCount: samplePhones.length,
+                  itemCount: sampleProducts.where((p) => p.isNew).length, 
                   separatorBuilder: (_, _) => const SizedBox(width: 14),
-                  itemBuilder: (context, i) =>
-                      ProductCard(phone: samplePhones[i]),
+                  itemBuilder: (context, i) {
+                    final product = sampleProducts.where((p) => p.isNew).elementAt(i);
+                    return ProductCard(product: product);
+                  },
                 ),
               ),
 

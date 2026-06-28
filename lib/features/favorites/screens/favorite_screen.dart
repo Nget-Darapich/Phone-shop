@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:phone_shop/core/router/app_router.dart';
 import 'package:phone_shop/core/widgets/custom_bottom_nav.dart';
-import '../../../data/models/phone_model.dart';
+import '../../../data/models/product_model.dart';
 
 class FavoriteScreen extends StatelessWidget {
   const FavoriteScreen({super.key});
@@ -16,7 +16,7 @@ class FavoriteScreen extends StatelessWidget {
       body: ValueListenableBuilder<Set<String>>(
         valueListenable: favoriteIdsNotifier,
         builder: (context, favorites, _) {
-          final items = samplePhones
+          final items = sampleProducts
               .where((phone) => favorites.contains(phone.id))
               .toList();
 
@@ -26,7 +26,7 @@ class FavoriteScreen extends StatelessWidget {
                 'No favorites yet. Tap the heart icon on a product to save it.',
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.7) ?? Colors.black54,
+                  color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.7) ?? Colors.black54,
                   fontSize: 16,
                 ),
               ),
@@ -36,7 +36,7 @@ class FavoriteScreen extends StatelessWidget {
           return ListView.separated(
             padding: const EdgeInsets.all(20),
             itemCount: items.length,
-            separatorBuilder: (_, __) => const SizedBox(height: 16),
+            separatorBuilder: (_, _) => const SizedBox(height: 16),
             itemBuilder: (context, index) {
               final phone = items[index];
               return InkWell(
@@ -62,7 +62,7 @@ class FavoriteScreen extends StatelessWidget {
                           width: 80,
                           height: 80,
                           fit: BoxFit.cover,
-                          errorBuilder: (_, __, ___) => Container(
+                          errorBuilder: (_, _, _) => Container(
                             width: 80,
                             height: 80,
                             color: const Color(0xFF1E293B),
@@ -86,9 +86,9 @@ class FavoriteScreen extends StatelessWidget {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              phone.brand,
+                              phone.brand.name[0].toUpperCase() + phone.brand.name.substring(1),
                               style: TextStyle(
-                                color: Colors.white.withOpacity(0.65),
+                                color: Colors.white.withValues(alpha: 0.65),
                                 fontSize: 13,
                               ),
                             ),

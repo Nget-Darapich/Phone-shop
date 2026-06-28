@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:phone_shop/data/models/phone_model.dart';
+import 'package:phone_shop/data/models/product_model.dart';
 import '../router/app_router.dart';
 
 class CustomBottomNav extends StatelessWidget {

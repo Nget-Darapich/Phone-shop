@@ -216,7 +216,7 @@ class MoreScreen extends StatelessWidget {
           ),
           trailing: Icon(
             Icons.arrow_forward_ios,
-            color: Theme.of(context).iconTheme.color?.withOpacity(0.6),
+            color: Theme.of(context).iconTheme.color?.withValues(alpha: 0.6),
             size: 16,
           ),
           onTap: () {

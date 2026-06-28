@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import '../../../core/router/app_router.dart';
-import '../../../data/models/phone_model.dart';
+import '../../../data/models/product_model.dart';
 
-/// Reusable product card — pass any [PhoneModel] and it handles tap → detail.
 class ProductCard extends StatelessWidget {
-  final PhoneModel phone;
+  final ProductModel product;
 
-  const ProductCard({super.key, required this.phone});
+  const ProductCard({super.key, required this.product});
 
   @override
   Widget build(BuildContext context) {
@@ -15,7 +14,7 @@ class ProductCard extends StatelessWidget {
       onTap: () => Navigator.pushNamed(
         context,
         AppRouter.product,
-        arguments: phone,
+        arguments: product,
       ),
       child: Container(
         width: 180,
@@ -36,7 +35,7 @@ class ProductCard extends StatelessWidget {
                   child: AspectRatio(
                     aspectRatio: 1,
                     child: Image.asset(
-                      phone.image,
+                      product.image,
                       fit: BoxFit.cover,
                       errorBuilder: (_, _, _) => Container(
                         color: const Color(0xFF1E293B),
@@ -48,7 +47,7 @@ class ProductCard extends StatelessWidget {
                 ),
 
                 // NEW badge
-                if (phone.isNew)
+                if (product.isNew)
                   Positioned(
                     top: 12,
                     left: 12,
@@ -62,12 +61,12 @@ class ProductCard extends StatelessWidget {
                   child: ValueListenableBuilder<Set<String>>(
                     valueListenable: favoriteIdsNotifier,
                     builder: (context, favorites, _) {
-                      final isFavorite = favorites.contains(phone.id);
+                      final isFavorite = favorites.contains(product.id);
                       return _CircleIcon(
                         icon: isFavorite
                             ? Icons.favorite_rounded
                             : Icons.favorite_border_rounded,
-                        onTap: () => toggleFavorite(phone),
+                        onTap: () => toggleFavorite(product),
                       );
                     },
                   ),
@@ -82,7 +81,7 @@ class ProductCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    phone.name,
+                    product.name,
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 14,
@@ -93,7 +92,7 @@ class ProductCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 3),
                   Text(
-                    phone.brand,
+                    product.brand.name[0].toUpperCase() + product.brand.name.substring(1),
                       style: TextStyle(
                           color: Color.fromRGBO(255, 255, 255, 0.45), fontSize: 12),
                   ),
@@ -102,7 +101,7 @@ class ProductCard extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        '\$${phone.price.toStringAsFixed(0)}',
+                        '\$${product.price.toStringAsFixed(0)}',
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 16,
@@ -115,7 +114,7 @@ class ProductCard extends StatelessWidget {
                               color: Color(0xFFFBBF24), size: 15),
                           const SizedBox(width: 3),
                           Text(
-                            phone.rating.toString(),
+                            product.rating.toString(),
                             style: const TextStyle(
                               color: Color(0xFFFBBF24),
                               fontSize: 13,

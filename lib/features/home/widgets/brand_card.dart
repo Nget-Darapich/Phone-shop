@@ -28,11 +28,11 @@ class BrandCircle extends StatelessWidget {
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
-                  colors: [backgroundColor.withOpacity(0.94), backgroundColor.withOpacity(0.72)],
+                  colors: [backgroundColor.withValues(alpha: 0.94), backgroundColor.withValues(alpha: 0.72)],
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: backgroundColor.withOpacity(0.28),
+                    color: backgroundColor.withValues(alpha: 0.28),
                     blurRadius: 22,
                     offset: const Offset(0, 14),
                   ),
@@ -47,7 +47,7 @@ class BrandCircle extends StatelessWidget {
                       width: 40,
                       height: 40,
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.18),
+                        color: Colors.white.withValues(alpha: 0.18),
                         shape: BoxShape.circle,
                       ),
                     ),
@@ -57,7 +57,7 @@ class BrandCircle extends StatelessWidget {
                       width: 54,
                       height: 54,
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.2),
+                        color: Colors.white.withValues(alpha: 0.2),
                         shape: BoxShape.circle,
                       ),
                       child: Center(
@@ -90,7 +90,7 @@ class BrandCircle extends StatelessWidget {
             Text(
               'Trusted choice',
               style: TextStyle(
-                color: Colors.white.withOpacity(0.75),
+                color: Colors.white.withValues(alpha: 0.75),
                 fontSize: 11,
                 fontWeight: FontWeight.w500,
               ),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../core/widgets/custom_bottom_nav.dart';
-import '../../../data/models/phone_model.dart';
+import '../../../data/models/product_model.dart';
 
 class CartScreen extends StatelessWidget {
   const CartScreen({super.key});
@@ -64,9 +64,9 @@ class CartScreen extends StatelessWidget {
 
           final cartItems = quantityById.entries
               .map((entry) {
-                final phone = samplePhones.firstWhere(
+                final phone = sampleProducts.firstWhere(
                   (phone) => phone.id == entry.key,
-                  orElse: () => samplePhones.first,
+                  orElse: () => sampleProducts.first,
                 );
                 return MapEntry(phone, entry.value);
               })
@@ -112,7 +112,7 @@ class CartScreen extends StatelessWidget {
   }
 
   Widget _buildCartItem({
-    required PhoneModel phone,
+    required ProductModel phone,
     required int quantity,
   }) {
     return Container(
@@ -145,7 +145,7 @@ class CartScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  phone.brand,
+                  phone.brand.name[0].toUpperCase() + phone.brand.name.substring(1),
                   style: const TextStyle(
                       color: _accent,
                       fontSize: 12,

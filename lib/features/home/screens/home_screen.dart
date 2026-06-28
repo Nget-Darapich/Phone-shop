@@ -2,7 +2,7 @@
 
 import '../../../core/widgets/custom_appbar.dart';
 import '../../../core/widgets/custom_bottom_nav.dart';
-import '../../../data/models/phone_model.dart';
+import '../../../data/models/product_model.dart';
 import '../widgets/brand_card.dart';
 import '../widgets/category_card.dart';
 import '../widgets/hero_banner.dart';
@@ -11,18 +11,18 @@ import '../widgets/product_card.dart';
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
-  static final List<_BrandItem> brandItems = [
-    _BrandItem(name: 'Apple', color: Color(0xFF3B82F6)),
-    _BrandItem(name: 'Samsung', color: Color(0xFF0EA5E9)),
-    _BrandItem(name: 'Xiaomi', color: Color(0xFFFB923C)),
-    _BrandItem(name: 'Oppo', color: Color(0xFF22C55E)),
+  static final List<BrandItem> brandItems = [
+    BrandItem(name: 'Apple', brand: ProductBrand.apple, color: Color(0xFF3B82F6)),
+    BrandItem(name: 'Samsung', brand: ProductBrand.samsung, color: Color(0xFF0EA5E9)),
+    BrandItem(name: 'Xiaomi', brand: ProductBrand.xiaomi, color: Color(0xFFFB923C)),
+    BrandItem(name: 'Oppo', brand: ProductBrand.oppo, color: Color(0xFF22C55E)),
   ];
 
-  static final List<_CategoryItem> categoryItems = [
-    _CategoryItem(icon: Icons.phone_android, title: 'Phones', color: Color(0xFF38BDF8)),
-    _CategoryItem(icon: Icons.tablet_android, title: 'Tablets', color: Color(0xFF818CF8)),
-    _CategoryItem(icon: Icons.watch, title: 'Wearables', color: Color(0xFFA855F7)),
-    _CategoryItem(icon: Icons.headphones, title: 'Accessories', color: Color(0xFF22C55E)),
+  static final List<CategoryItem> categoryItems = [
+    CategoryItem(icon: Icons.phone_android, title: 'Phones', category: ProductCategory.phones, color: Color(0xFF38BDF8)),
+    CategoryItem(icon: Icons.tablet_android, title: 'Tablets', category: ProductCategory.tablets, color: Color(0xFF818CF8)),
+    CategoryItem(icon: Icons.watch, title: 'Wearables', category: ProductCategory.wearables, color: Color(0xFFA855F7)),
+    CategoryItem(icon: Icons.headphones, title: 'Accessories', category: ProductCategory.accessories, color: Color(0xFF22C55E)),
   ];
 
   static final List<_CategoryData> _categories = [
@@ -97,13 +97,17 @@ class HomeScreen extends StatelessWidget {
                       child: ListView.separated(
                         scrollDirection: Axis.horizontal,
                         itemCount: brandItems.length,
-                        separatorBuilder: (_, __) => const SizedBox(width: 18),
+                        separatorBuilder: (_, _) => const SizedBox(width: 18),
                         itemBuilder: (context, index) {
                           final item = brandItems[index];
                           return BrandCircle(
                             brand: item.name,
                             backgroundColor: item.color,
-                            onTap: () {},
+                            onTap: () => Navigator.pushNamed(
+                              context,
+                              '/product_list',
+                              arguments: ProductListFilter.byBrand(item.brand),
+                            ),
                           );
                         },
                       ),
@@ -157,13 +161,18 @@ class HomeScreen extends StatelessWidget {
                       child: ListView.separated(
                         scrollDirection: Axis.horizontal,
                         itemCount: categoryItems.length,
-                        separatorBuilder: (_, __) => const SizedBox(width: 16),
+                        separatorBuilder: (_, _) => const SizedBox(width: 16),
                         itemBuilder: (context, index) {
                           final item = categoryItems[index];
                           return CategoryCard(
                             icon: item.icon,
                             title: item.title,
                             accentColor: item.color,
+                            onTap: () => Navigator.pushNamed(
+                              context,
+                              '/product_list',
+                              arguments: ProductListFilter.byCategory(item.category),
+                            ),
                           );
                         },
                       ),
@@ -180,7 +189,7 @@ class HomeScreen extends StatelessWidget {
                 child: ListView.separated(
                   scrollDirection: Axis.horizontal,
                   itemCount: _categories.length,
-                  separatorBuilder: (_, __) => const SizedBox(width: 14),
+                  separatorBuilder: (_, _) => const SizedBox(width: 14),
                   itemBuilder: (context, index) {
                     final category = _categories[index];
                     return Container(
@@ -198,7 +207,7 @@ class HomeScreen extends StatelessWidget {
                             width: 42,
                             height: 42,
                             decoration: BoxDecoration(
-                              color: category.color.withOpacity(0.18),
+                              color: category.color.withValues(alpha: 0.18),
                               borderRadius: BorderRadius.circular(14),
                             ),
                             child: Icon(category.icon, color: category.color, size: 24),
@@ -264,7 +273,7 @@ class HomeScreen extends StatelessWidget {
                             child: Opacity(
                               opacity: 0.85,
                               child: Image.asset(
-                                samplePhones.first.image,
+                                sampleProducts.first.image,
                                 width: 180,
                                 height: 180,
                                 fit: BoxFit.contain,
@@ -278,12 +287,12 @@ class HomeScreen extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  samplePhones.first.name,
+                                  sampleProducts.first.name,
                                   style: textTheme.headlineSmall?.copyWith(color: Colors.white, fontWeight: FontWeight.w800),
                                 ),
                                 const SizedBox(height: 8),
                                 Text(
-                                  '\$${samplePhones.first.price.toStringAsFixed(0)}',
+                                  '\$${sampleProducts.first.price.toStringAsFixed(0)}',
                                   style: textTheme.titleLarge?.copyWith(color: Colors.white, fontWeight: FontWeight.bold),
                                 ),
                               ],
@@ -302,9 +311,9 @@ class HomeScreen extends StatelessWidget {
                 height: 300,
                 child: ListView.separated(
                   scrollDirection: Axis.horizontal,
-                  itemCount: samplePhones.length,
-                  separatorBuilder: (_, __) => const SizedBox(width: 14),
-                  itemBuilder: (context, i) => ProductCard(phone: samplePhones[i]),
+                  itemCount: sampleProducts.length,
+                  separatorBuilder: (_, _) => const SizedBox(width: 14),
+                  itemBuilder: (context, i) => ProductCard(product: sampleProducts[i]),
                 ),
               ),
               const SizedBox(height: 30),
@@ -349,19 +358,21 @@ class HomeScreen extends StatelessWidget {
   }
 }
 
-class _BrandItem {
+class BrandItem {
   final String name;
+  final ProductBrand brand;
   final Color color;
 
-  const _BrandItem({required this.name, required this.color});
+  const BrandItem({required this.name, required this.brand, required this.color});
 }
 
-class _CategoryItem {
+class CategoryItem {
   final IconData icon;
   final String title;
+  final ProductCategory category;
   final Color color;
 
-  const _CategoryItem({required this.icon, required this.title, required this.color});
+  const CategoryItem({required this.icon, required this.title, required this.category, required this.color});
 }
 
 class _CategoryData {

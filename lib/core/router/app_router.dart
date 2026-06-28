@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:phone_shop/data/models/phone_model.dart';
+import 'package:phone_shop/data/models/product_model.dart';
 import 'package:phone_shop/features/auth/screens/auth_screen.dart';
 import 'package:phone_shop/features/home/screens/home_screen.dart';
 import 'package:phone_shop/features/favorites/screens/favorite_screen.dart';
@@ -13,6 +13,7 @@ import 'package:phone_shop/features/more/screens/support_chat_screen.dart';
 import 'package:phone_shop/features/more/screens/store_locator_screen.dart';
 import 'package:phone_shop/features/more/screens/media_review_screen.dart';
 import 'package:phone_shop/features/cart/screens/cart_screen.dart';
+import 'package:phone_shop/features/product_list/screens/product_list_screen.dart';
 import 'package:phone_shop/features/compare/screens/compare_screen.dart';
 import 'package:phone_shop/features/product/screens/product_detail_screen.dart';
 import 'package:phone_shop/features/checkout/screens/checkout_screen.dart';
@@ -36,11 +37,13 @@ class AppRouter {
   static const String mediaReview = '/media_review';
   static const String bookAppointment = '/book_appointment';
   static const String supportChat = '/support_chat';
+  static const String productList = '/product_list';
 
   /// All available route names in the app.
   static final Set<String> availableRoutes = {
     home,
     product,
+    productList,
     cart,
     profile,
     favorite,
@@ -66,9 +69,9 @@ class AppRouter {
 
       case product:
         final args = settings.arguments;
-        if (args is PhoneModel) {
+        if (args is ProductModel) {
           return MaterialPageRoute(
-            builder: (_) => ProductDetailScreen(phone: args),
+            builder: (_) => ProductDetailScreen(product: args),
             settings: settings,
           );
         }
@@ -131,7 +134,11 @@ class AppRouter {
 
       case supportChat:
         return MaterialPageRoute(builder: (_) => const SupportChatScreen());
-
+      case productList:
+        final filter = settings.arguments as ProductListFilter;
+        return MaterialPageRoute(
+          builder: (_) => ProductListScreen(filter: filter),
+        );
       // case compare:
       //   return MaterialPageRoute(builder: (_) => const CompareScreen());
 

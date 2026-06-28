@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../core/widgets/custom_bottom_nav.dart';
-import '../../../data/models/phone_model.dart';
+import '../../../data/models/product_model.dart';
 
 class CompareScreen extends StatelessWidget {
   const CompareScreen({super.key});
@@ -22,7 +22,7 @@ class CompareScreen extends StatelessWidget {
       body: ValueListenableBuilder<Set<String>>(
         valueListenable: compareIdsNotifier,
         builder: (context, compareIds, _) {
-          final items = comparePhones();
+          final items = compareProducts();
           if (items.isEmpty) {
             return const SafeArea(
               child: Center(
@@ -49,7 +49,7 @@ class CompareScreen extends StatelessWidget {
                         width: 90,
                         height: 90,
                         child: Image.asset(phone.image, fit: BoxFit.cover,
-                          errorBuilder: (_, __, ___) {
+                          errorBuilder: (_, _, _) {
                             return const Icon(Icons.phone_android, color: Colors.white30, size: 48);
                           },
                         ),
@@ -62,7 +62,7 @@ class CompareScreen extends StatelessWidget {
                             Text(phone.name,
                                 style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w700)),
                             const SizedBox(height: 4),
-                            Text(phone.brand,
+                            Text(phone.brand.name[0].toUpperCase() + phone.brand.name.substring(1),
                                 style: const TextStyle(color: Color(0xFF38BDF8), fontSize: 12, fontWeight: FontWeight.w600)),
                             const SizedBox(height: 12),
                             Text(phone.description,
@@ -82,7 +82,7 @@ class CompareScreen extends StatelessWidget {
                   ),
                 );
               },
-              separatorBuilder: (_, __) => const SizedBox(height: 16),
+              separatorBuilder: (_, _) => const SizedBox(height: 16),
               itemCount: items.length,
             ),
           );

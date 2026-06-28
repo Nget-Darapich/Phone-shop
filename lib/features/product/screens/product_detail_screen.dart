@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/widgets/custom_bottom_nav.dart';
-import '../../../data/models/phone_model.dart';
+import '../../../data/models/product_model.dart';
 import '../widgets/color_selector.dart';
 import '../widgets/storage_selector.dart';
 import '../widgets/specification_tile.dart';
 
 class ProductDetailScreen extends StatefulWidget {
-  final PhoneModel phone;
+  final ProductModel product;
 
-  const ProductDetailScreen({super.key, required this.phone});
+  const ProductDetailScreen({super.key, required this.product});
 
   @override
   State<ProductDetailScreen> createState() => _ProductDetailScreenState();
@@ -25,7 +25,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final phone = widget.phone;
+    final product = widget.product;
     final theme = Theme.of(context);
 
     return Scaffold(
@@ -73,7 +73,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       fit: StackFit.expand,
                       children: [
                         Image.asset(
-                          phone.image,
+                          product.image,
                           fit: BoxFit.cover,
                           errorBuilder: (_, _, _) => Container(
                             color: _surface,
@@ -107,14 +107,14 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                 ValueListenableBuilder<Set<String>>(
                                   valueListenable: favoriteIdsNotifier,
                                   builder: (context, favorites, _) {
-                                    final isFavorite = favorites.contains(phone.id);
+                                    final isFavorite = favorites.contains(product.id);
                                     return _RoundedActionButton(
                                       icon: isFavorite
                                           ? Icons.favorite_rounded
                                           : Icons.favorite_border_rounded,
                                       iconColor:
                                           isFavorite ? Colors.red : Colors.white,
-                                      onTap: () => toggleFavorite(phone),
+                                      onTap: () => toggleFavorite(product),
                                     );
                                   },
                                 ),
@@ -141,7 +141,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       children: [
                         // Brand name (accent colour)
                         Text(
-                          phone.brand,
+                          product.brand.name[0].toUpperCase() + product.brand.name.substring(1),
                           style: const TextStyle(
                               color: _accent,
                               fontSize: 13,
@@ -152,7 +152,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
                         // Product name
                         Text(
-                          phone.name,
+                          product.name,
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 24,
@@ -168,7 +168,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                 color: Color(0xFFFBBF24), size: 18),
                             const SizedBox(width: 4),
                             Text(
-                              phone.rating.toString(),
+                              product.rating.toString(),
                               style: const TextStyle(
                                   color: Color(0xFFFBBF24),
                                   fontSize: 14,
@@ -176,9 +176,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                             ),
                             const SizedBox(width: 8),
                             Text(
-                              '${phone.reviewCount} reviews',
+                              '${product.reviewCount} reviews',
                               style: TextStyle(
-                                  color: theme.colorScheme.onBackground.withOpacity(0.55),
+                                  color: theme.colorScheme.onSurface.withValues(alpha: 0.55),
                                   fontSize: 13),
                             ),
                           ],
@@ -186,9 +186,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
                         const SizedBox(height: 12),
                         Text(
-                          phone.description,
+                          product.description,
                           style: TextStyle(
-                            color: theme.colorScheme.onBackground.withOpacity(0.72),
+                            color: theme.colorScheme.onSurface.withValues(alpha: 0.72),
                             fontSize: 14,
                             height: 1.6,
                           ),
@@ -200,11 +200,11 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                           children: [
                             _InfoChip(
                               icon: Icons.palette_outlined,
-                              label: '${phone.colors.length} colors',
+                              label: '${product.colors.length} colors',
                             ),
                             _InfoChip(
                               icon: Icons.sd_storage,
-                              label: phone.storage.first,
+                              label: product.storage.first,
                             ),
                             _InfoChip(
                               icon: Icons.bolt_outlined,
@@ -245,7 +245,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                 children: [
                                   Expanded(
                                     child: Text(
-                                      '\$${phone.price.toStringAsFixed(0)}',
+                                      '\$${product.price.toStringAsFixed(0)}',
                                       style: const TextStyle(
                                         color: Colors.white,
                                         fontSize: 26,
@@ -256,9 +256,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                   const SizedBox(width: 12),
                                   Expanded(
                                     child: Text(
-                                      'or \$${phone.monthlyPrice.toStringAsFixed(2)}/mo for ${phone.monthlyDuration} mos.',
+                                      'or \$${product.monthlyPrice.toStringAsFixed(2)}/mo for ${product.monthlyDuration} mos.',
                                       style: TextStyle(
-                                        color: theme.colorScheme.onBackground.withOpacity(0.65),
+                                        color: theme.colorScheme.onSurface.withValues(alpha: 0.65),
                                         fontSize: 12,
                                       ),
                                       maxLines: 2,
@@ -275,7 +275,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
                         // ── Color selector ─────────────────────
                         Text(
-                          'Color - ${phone.colors[_selectedColor]}',
+                          'Color - ${product.colors[_selectedColor]}',
                           style: const TextStyle(
                               color: Colors.white,
                               fontSize: 15,
@@ -283,7 +283,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         ),
                         const SizedBox(height: 12),
                         ColorSelector(
-                          colors: phone.colors,
+                          colors: product.colors,
                           selectedIndex: _selectedColor,
                           onSelected: (i) =>
                               setState(() => _selectedColor = i),
@@ -301,7 +301,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         ),
                         const SizedBox(height: 12),
                         StorageSelector(
-                          options: phone.storage,
+                          options: product.storage,
                           selectedIndex: _selectedStorage,
                           onSelected: (i) =>
                               setState(() => _selectedStorage = i),
@@ -334,21 +334,21 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         // ── Specification tiles ─────────────────
                         SpecificationTile(
                           title: 'Display',
-                          content: phone.displaySpec,
+                          content: product.displaySpec,
                           initiallyExpanded: true,
                         ),
                         SpecificationTile(
                           title: 'Camera',
-                          content: phone.cameraSpec,
+                          content: product.cameraSpec,
                         ),
                         SpecificationTile(
                           title: 'Processor & Battery',
                           content:
-                              '${phone.processorSpec}\n${phone.batterySpec}',
+                              '${product.processorSpec}\n${product.batterySpec}',
                         ),
                         SpecificationTile(
                           title: 'Connectivity',
-                          content: phone.connectivitySpec,
+                          content: product.connectivitySpec,
                         ),
 
                         const SizedBox(height: 100), // space above CTA bar
@@ -364,11 +364,11 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           ValueListenableBuilder<Set<String>>(
             valueListenable: compareIdsNotifier,
             builder: (context, compareIds, _) {
-              final isCompared = compareIds.contains(phone.id);
+              final isCompared = compareIds.contains(product.id);
               return ValueListenableBuilder<List<String>>(
                 valueListenable: cartIdsNotifier,
                 builder: (context, cartIds, _) {
-                  final inCart = cartIds.contains(phone.id);
+                  final inCart = cartIds.contains(product.id);
                   return Container(
                     padding: EdgeInsets.fromLTRB(
                         20, 14, 20, MediaQuery.of(context).padding.bottom + 14),
@@ -381,7 +381,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         Expanded(
                           child: OutlinedButton(
                             onPressed: () {
-                              toggleCompare(phone);
+                              toggleCompare(product);
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
                                   content: Text(isCompared
@@ -409,7 +409,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         Expanded(
                           child: ElevatedButton(
                             onPressed: () {
-                              addToCart(phone);
+                              addToCart(product);
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
                                   content: Text(inCart

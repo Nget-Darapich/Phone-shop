@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/widgets/custom_bottom_nav.dart';
-import '../../../data/models/phone_model.dart';
+import '../../../data/models/product_model.dart';
 import '../widgets/color_selector.dart';
 import '../widgets/storage_selector.dart';
 import '../widgets/specification_tile.dart';
 
 class ProductDetailScreen extends StatefulWidget {
-  const ProductDetailScreen({super.key});
+  final ProductModel product;
+
+  const ProductDetailScreen({super.key, required this.product});
 
   @override
   State<ProductDetailScreen> createState() => _ProductDetailScreenState();
@@ -16,20 +18,33 @@ class ProductDetailScreen extends StatefulWidget {
 class _ProductDetailScreenState extends State<ProductDetailScreen> {
   int _selectedColor = 0;
   int _selectedStorage = 0;
-  bool _isFavorite = false;
 
-  static const _bg = Color(0xFF020617);
-  static const _surface = Color(0xFF0F172A);
   static const _accent = Color(0xFF38BDF8);
+
+  void _showSnack(BuildContext context, String message, {Duration? duration, SnackBarAction? action}) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        duration: duration ?? const Duration(milliseconds: 900),
+        content: GestureDetector(
+          onTap: () => ScaffoldMessenger.of(context).clearSnackBars(),
+          child: Text(message),
+        ),
+        action: action,
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    // Receive PhoneModel passed via Navigator arguments
-    final phone =
-        ModalRoute.of(context)!.settings.arguments as PhoneModel;
+    final product = widget.product;
+    final theme = Theme.of(context);
+    final onSurface = theme.colorScheme.onSurface;
+    final textTheme = theme.textTheme;
+    final divider = theme.dividerColor;
+    final card = theme.cardColor;
 
     return Scaffold(
-      backgroundColor: _bg,
+      backgroundColor: theme.scaffoldBackgroundColor,
       bottomNavigationBar: CustomBottomNav(selectedIndex: 0),
       body: Column(
         children: [
@@ -40,45 +55,36 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 // ── SliverAppBar with hero image ──────────────
                 SliverAppBar(
                   expandedHeight: 300,
-                  backgroundColor: _surface,
+                  backgroundColor: card,
                   pinned: true,
                   leading: GestureDetector(
-                    onTap: () => Navigator.pop(context),
+                    onTap: () => Navigator.pushNamedAndRemoveUntil(context, AppRouter.home, (route) => false),
                     child: Container(
                       margin: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: Color.fromRGBO(0, 0, 0, 0.35),
+                        color: onSurface.withValues(alpha: 0.12),
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(Icons.arrow_back_ios_new_rounded,
-                          color: Colors.white, size: 18),
+                      child: Icon(Icons.arrow_back_ios_new_rounded,
+                          color: onSurface, size: 18),
                     ),
                   ),
-                  title: const Text(
+                  title: Text(
                     'Product Details',
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600),
+                    style: textTheme.titleMedium?.copyWith(color: onSurface),
                   ),
-                  actions: [
-                    _AppBarIcon(Icons.search_rounded, onTap: () {}),
-                    _AppBarIcon(Icons.notifications_none_rounded,
-                        onTap: () {}),
-                    _AppBarIcon(Icons.wb_sunny_outlined, onTap: () {}),
-                    const SizedBox(width: 8),
-                  ],
+                  actions: const [SizedBox(width: 8)],
                   flexibleSpace: FlexibleSpaceBar(
                     background: Stack(
                       fit: StackFit.expand,
                       children: [
                         Image.asset(
-                          phone.image,
+                          product.image,
                           fit: BoxFit.cover,
                           errorBuilder: (_, _, _) => Container(
-                            color: _surface,
-                            child: const Icon(Icons.phone_android,
-                                size: 120, color: Color(0xFF334155)),
+                            color: card,
+                            child: Icon(Icons.phone_android,
+                                size: 120, color: onSurface.withValues(alpha: 0.3)),
                           ),
                         ),
                         // Gradient overlay so appbar blends
@@ -104,15 +110,19 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                           child: SafeArea(
                             child: Column(
                               children: [
-                                _RoundedActionButton(
-                                  icon: _isFavorite
-                                      ? Icons.favorite_rounded
-                                      : Icons.favorite_border_rounded,
-                                  iconColor: _isFavorite
-                                      ? Colors.red
-                                      : Colors.white,
-                                  onTap: () =>
-                                      setState(() => _isFavorite = !_isFavorite),
+                                ValueListenableBuilder<Set<String>>(
+                                  valueListenable: favoriteIdsNotifier,
+                                  builder: (context, favorites, _) {
+                                    final isFavorite = favorites.contains(product.id);
+                                    return _RoundedActionButton(
+                                      icon: isFavorite
+                                          ? Icons.favorite_rounded
+                                          : Icons.favorite_border_rounded,
+                                      iconColor:
+                                          isFavorite ? Colors.red : Colors.white,
+                                      onTap: () => toggleFavorite(product),
+                                    );
+                                  },
                                 ),
                                 const SizedBox(height: 8),
                                 _RoundedActionButton(
@@ -137,7 +147,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       children: [
                         // Brand name (accent colour)
                         Text(
-                          phone.brand,
+                          product.brand.name[0].toUpperCase() + product.brand.name.substring(1),
                           style: const TextStyle(
                               color: _accent,
                               fontSize: 13,
@@ -148,11 +158,15 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
                         // Product name
                         Text(
-                          phone.name,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 24,
-                            fontWeight: FontWeight.w800,
+                          product.name,
+                          style: textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w800),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          'ID: ${product.id}',
+                          style: TextStyle(
+                            color: onSurface.withValues(alpha: 0.45),
+                            fontSize: 12,
                           ),
                         ),
                         const SizedBox(height: 6),
@@ -164,7 +178,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                 color: Color(0xFFFBBF24), size: 18),
                             const SizedBox(width: 4),
                             Text(
-                              phone.rating.toString(),
+                              product.rating.toString(),
                               style: const TextStyle(
                                   color: Color(0xFFFBBF24),
                                   fontSize: 14,
@@ -172,24 +186,51 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                             ),
                             const SizedBox(width: 8),
                             Text(
-                              '${phone.reviewCount} reviews',
+                              '${product.reviewCount} reviews',
                               style: TextStyle(
-                                  color: Color.fromRGBO(255, 255, 255, 0.45),
+                                  color: theme.colorScheme.onSurface.withValues(alpha: 0.55),
                                   fontSize: 13),
                             ),
                           ],
                         ),
 
+                        const SizedBox(height: 12),
+                        Text(
+                          product.description,
+                          style: TextStyle(
+                            color: theme.colorScheme.onSurface.withValues(alpha: 0.72),
+                            fontSize: 14,
+                            height: 1.6,
+                          ),
+                        ),
+                        const SizedBox(height: 18),
+                        Wrap(
+                          spacing: 10,
+                          runSpacing: 10,
+                          children: [
+                            _InfoChip(
+                              icon: Icons.palette_outlined,
+                              label: '${product.colors.length} colors',
+                            ),
+                            _InfoChip(
+                              icon: Icons.sd_storage,
+                              label: product.storage.first,
+                            ),
+                            _InfoChip(
+                              icon: Icons.bolt_outlined,
+                              label: 'Fast charge',
+                            ),
+                          ],
+                        ),
                         const SizedBox(height: 20),
 
                         // ── Price block ────────────────────────
                         Container(
                           padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
-                            color: _surface,
+                            color: card,
                             borderRadius: BorderRadius.circular(14),
-                            border: Border.all(
-                              color: Color.fromRGBO(255, 255, 255, 0.07)),
+                            border: Border.all(color: divider),
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -209,22 +250,24 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                               ),
                               const SizedBox(height: 10),
                               Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(
-                                    '\$${phone.price.toStringAsFixed(0)}',
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 26,
-                                      fontWeight: FontWeight.w900,
+                                  Expanded(
+                                    child: Text(
+                                      '\$${product.price.toStringAsFixed(0)}',
+                                      style: textTheme.headlineLarge?.copyWith(fontWeight: FontWeight.w900),
                                     ),
                                   ),
-                                  Text(
-                                    'or \$${phone.monthlyPrice.toStringAsFixed(2)}/mo for ${phone.monthlyDuration} mos.',
-                                    style: TextStyle(
-                                      color: Color.fromRGBO(255, 255, 255, 0.5),
-                                      fontSize: 12,
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Text(
+                                      'or \$${product.monthlyPrice.toStringAsFixed(2)}/mo for ${product.monthlyDuration} mos.',
+                                      style: TextStyle(
+                                        color: onSurface.withValues(alpha: 0.65),
+                                        fontSize: 12,
+                                      ),
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
                                     ),
                                   ),
                                 ],
@@ -237,15 +280,12 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
                         // ── Color selector ─────────────────────
                         Text(
-                          'Color - ${phone.colors[_selectedColor]}',
-                          style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 15,
-                              fontWeight: FontWeight.w600),
+                          'Color - ${product.colors[_selectedColor]}',
+                          style: textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600),
                         ),
                         const SizedBox(height: 12),
                         ColorSelector(
-                          colors: phone.colors,
+                          colors: product.colors,
                           selectedIndex: _selectedColor,
                           onSelected: (i) =>
                               setState(() => _selectedColor = i),
@@ -254,16 +294,13 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         const SizedBox(height: 24),
 
                         // ── Storage selector ───────────────────
-                        const Text(
+                        Text(
                           'Storage',
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 15,
-                              fontWeight: FontWeight.w600),
+                          style: textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600),
                         ),
                         const SizedBox(height: 12),
                         StorageSelector(
-                          options: phone.storage,
+                          options: product.storage,
                           selectedIndex: _selectedStorage,
                           onSelected: (i) =>
                               setState(() => _selectedStorage = i),
@@ -273,21 +310,21 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
                         // ── Feature cards (warranty / delivery / return) ──
                         Row(
-                          children: [
-                            _FeatureCard(
+                          children: const [
+                            Expanded(child: _FeatureCard(
                               icon: Icons.verified_outlined,
                               label: '1 Year\nWarranty',
-                            ),
-                            const SizedBox(width: 10),
-                            _FeatureCard(
+                            )),
+                            SizedBox(width: 10),
+                            Expanded(child: _FeatureCard(
                               icon: Icons.local_shipping_outlined,
                               label: 'Free\nDelivery',
-                            ),
-                            const SizedBox(width: 10),
-                            _FeatureCard(
+                            )),
+                            SizedBox(width: 10),
+                            Expanded(child: _FeatureCard(
                               icon: Icons.replay_rounded,
                               label: '14 Days\nReturn',
-                            ),
+                            )),
                           ],
                         ),
 
@@ -296,21 +333,21 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         // ── Specification tiles ─────────────────
                         SpecificationTile(
                           title: 'Display',
-                          content: phone.displaySpec,
+                          content: product.displaySpec,
                           initiallyExpanded: true,
                         ),
                         SpecificationTile(
                           title: 'Camera',
-                          content: phone.cameraSpec,
+                          content: product.cameraSpec,
                         ),
                         SpecificationTile(
                           title: 'Processor & Battery',
                           content:
-                              '${phone.processorSpec}\n${phone.batterySpec}',
+                              '${product.processorSpec}\n${product.batterySpec}',
                         ),
                         SpecificationTile(
                           title: 'Connectivity',
-                          content: phone.connectivitySpec,
+                          content: product.connectivitySpec,
                         ),
 
                         const SizedBox(height: 100), // space above CTA bar
@@ -323,55 +360,93 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           ),
 
           // ── Fixed bottom CTA bar ──────────────────────────────
-          Container(
-            padding: EdgeInsets.fromLTRB(
-                20, 14, 20, MediaQuery.of(context).padding.bottom + 14),
-            decoration: BoxDecoration(
-          color: _surface,
-          border: Border(top: BorderSide(color: Color.fromRGBO(255, 255, 255, 0.07))),
-        ),
-            child: Row(
-              children: [
-                // Reserve in Store
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: () {},
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: Colors.white,
-                      side: BorderSide(color: Color.fromRGBO(255, 255, 255, 0.2)),
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14)),
+          ValueListenableBuilder<Set<String>>(
+            valueListenable: compareIdsNotifier,
+            builder: (context, compareIds, _) {
+              final isCompared = compareIds.contains(product.id);
+              return ValueListenableBuilder<List<String>>(
+                valueListenable: cartIdsNotifier,
+                builder: (context, cartIds, _) {
+                  final inCart = cartIds.contains(product.id);
+                  return Container(
+                    padding: EdgeInsets.fromLTRB(
+                        20, 14, 20, MediaQuery.of(context).padding.bottom + 14),
+                    decoration: BoxDecoration(
+                      color: card,
+                      border: Border(top: BorderSide(color: divider)),
                     ),
-                    child: const Text('Reserve in Store',
-                        style: TextStyle(
-                            fontWeight: FontWeight.w600, fontSize: 14)),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                // Buy Now
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () => Navigator.pushNamed(
-                      context,
-                      AppRouter.checkout,
-                      arguments: phone.price,
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: OutlinedButton(
+                            onPressed: () {
+                              if (!isCompared && compareIds.length >= maxCompare) {
+                                _showSnack(context, 'Compare list is full (max 4)',
+                                    duration: const Duration(milliseconds: 1200));
+                                return;
+                              }
+                              final added = toggleCompare(product);
+                              if (added) {
+                                _showSnack(context, 'Added to compare list',
+                                  action: SnackBarAction(
+                                    label: 'View',
+                                    onPressed: () => Navigator.pushNamedAndRemoveUntil(
+                                        context, AppRouter.compare, (route) => false),
+                                  ),
+                                );
+                              } else if (!isCompared) {
+                                _showSnack(context, 'Removed from compare list');
+                              }
+                            },
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: onSurface,
+                              side: BorderSide(color: divider),
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(14)),
+                            ),
+                            child: Text(
+                              isCompared ? 'Compared' : 'Add to Compare',
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.w600, fontSize: 14),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: () {
+                              addToCart(product);
+                              _showSnack(context, inCart
+                                  ? 'Added another item to cart'
+                                  : 'Added to cart',
+                                action: SnackBarAction(
+                                  label: 'View cart',
+                                  onPressed: () => Navigator.pushNamed(context, AppRouter.cart),
+                                ),
+                              );
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: _accent,
+                              foregroundColor: const Color(0xFF020617),
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(14)),
+                              elevation: 0,
+                            ),
+                            child: Text(
+                              inCart ? 'Add Again' : 'Add to Cart',
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.w700, fontSize: 14),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: _accent,
-                      foregroundColor: const Color(0xFF020617),
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14)),
-                      elevation: 0,
-                    ),
-                    child: const Text('Buy Now',
-                        style: TextStyle(
-                            fontWeight: FontWeight.w700, fontSize: 14)),
-                  ),
-                ),
-              ],
-            ),
+                  );
+                },
+              );
+            },
           ),
         ],
       ),
@@ -381,37 +456,15 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
 // ── Private helpers ─────────────────────────────────────────────────────────
 
-class _AppBarIcon extends StatelessWidget {
-  final IconData icon;
-  final VoidCallback onTap;
-  const _AppBarIcon(this.icon, {required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
-        padding: const EdgeInsets.all(6),
-        decoration: BoxDecoration(
-          color: Color.fromRGBO(255, 255, 255, 0.08),
-          shape: BoxShape.circle,
-        ),
-        child: Icon(icon, color: Colors.white, size: 18),
-      ),
-    );
-  }
-}
-
 class _RoundedActionButton extends StatelessWidget {
   final IconData icon;
-  final Color iconColor;
+  final Color? iconColor;
   final VoidCallback onTap;
 
   const _RoundedActionButton({
     required this.icon,
     required this.onTap,
-    this.iconColor = Colors.white,
+    this.iconColor,
   });
 
   @override
@@ -423,10 +476,46 @@ class _RoundedActionButton extends StatelessWidget {
         width: 38,
         height: 38,
         decoration: BoxDecoration(
-          color: Color.fromRGBO(0, 0, 0, 0.35),
+          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.12),
           shape: BoxShape.circle,
         ),
-        child: Icon(icon, color: iconColor, size: 20),
+        child: Icon(icon, color: iconColor ?? Theme.of(context).colorScheme.onSurface, size: 20),
+      ),
+    );
+  }
+}
+
+class _InfoChip extends StatelessWidget {
+  final IconData icon;
+  final String label;
+
+  const _InfoChip({required this.icon, required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final onSurface = theme.colorScheme.onSurface;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: theme.cardColor,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: theme.dividerColor),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, color: theme.colorScheme.primary, size: 16),
+          const SizedBox(width: 8),
+          Text(
+            label,
+            style: TextStyle(
+              color: onSurface.withValues(alpha: 0.7),
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -440,28 +529,29 @@ class _FeatureCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 14),
-        decoration: BoxDecoration(
-          color: const Color(0xFF0F172A),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Color.fromRGBO(255, 255, 255, 0.07)),
-        ),
-        child: Column(
-          children: [
-            Icon(icon, color: const Color(0xFF38BDF8), size: 22),
-            const SizedBox(height: 6),
-            Text(
-              label,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Color.fromRGBO(255, 255, 255, 0.65),
-                fontSize: 11,
-                height: 1.4),
+    final theme = Theme.of(context);
+    final onSurface = theme.colorScheme.onSurface;
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 14),
+      decoration: BoxDecoration(
+        color: theme.cardColor,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: theme.dividerColor),
+      ),
+      child: Column(
+        children: [
+          Icon(icon, color: theme.colorScheme.primary, size: 22),
+          const SizedBox(height: 6),
+          Text(
+            label,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: onSurface.withValues(alpha: 0.65),
+              fontSize: 11,
+              height: 1.4,
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

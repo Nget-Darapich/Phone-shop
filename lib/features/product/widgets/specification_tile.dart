@@ -52,12 +52,14 @@ class _SpecificationTileState extends State<SpecificationTile>
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final onSurface = theme.colorScheme.onSurface;
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       decoration: BoxDecoration(
-        color: const Color(0xFF0F172A),
+        color: theme.cardColor,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Color.fromRGBO(255, 255, 255, 0.07)),
+        border: Border.all(color: theme.dividerColor),
       ),
       child: Column(
         children: [
@@ -73,16 +75,16 @@ class _SpecificationTileState extends State<SpecificationTile>
                 children: [
                   Text(
                     widget.title,
-                    style: const TextStyle(
-                      color: Colors.white,
+                    style: TextStyle(
+                      color: onSurface,
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
                   RotationTransition(
                     turns: _rotation,
-                    child: const Icon(Icons.keyboard_arrow_down_rounded,
-                        color: Colors.white60, size: 22),
+                    child: Icon(Icons.keyboard_arrow_down_rounded,
+                        color: onSurface.withValues(alpha: 0.6), size: 22),
                   ),
                 ],
               ),
@@ -97,9 +99,10 @@ class _SpecificationTileState extends State<SpecificationTile>
               child: Text(
                 widget.content,
                 style: TextStyle(
-                  color: Color.fromRGBO(255, 255, 255, 0.55),
+                  color: onSurface.withValues(alpha: 0.55),
                   fontSize: 13,
-                  height: 1.6),
+                  height: 1.6,
+                ),
               ),
             ),
           ),

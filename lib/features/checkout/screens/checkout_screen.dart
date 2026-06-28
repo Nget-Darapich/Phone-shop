@@ -1,7 +1,12 @@
+import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:image_picker/image_picker.dart';
 import '../../../core/widgets/custom_bottom_nav.dart';
 import '../../../data/models/checkout_model.dart';
+import '../../../data/models/order_model.dart';
+import '../../../data/models/product_model.dart';
 
 class CheckoutScreen extends StatefulWidget {
   const CheckoutScreen({super.key});
@@ -11,28 +16,23 @@ class CheckoutScreen extends StatefulWidget {
 }
 
 class _CheckoutScreenState extends State<CheckoutScreen> {
-  CheckoutModel _form = const CheckoutModel();
+  CheckoutFormModel _form = const CheckoutFormModel();
 
   final _fullNameCtrl   = TextEditingController();
   final _streetCtrl     = TextEditingController();
   final _cityCtrl       = TextEditingController();
-  final _zipCtrl        = TextEditingController();
   final _telegramCtrl   = TextEditingController();
   final _phoneCtrl      = TextEditingController();
   final _cardNumberCtrl = TextEditingController();
   final _expiryCtrl     = TextEditingController();
   final _cvcCtrl        = TextEditingController();
   final _formKey        = GlobalKey<FormState>();
-
-  static const _bg      = Color(0xFF020617);
-  static const _surface = Color(0xFF0F172A);
-  static const _accent  = Color(0xFF38BDF8);
-  static const _label   = Color(0xFF64748B);
+  String? _screenshotPath;
 
   @override
   void dispose() {
     for (final c in [
-      _fullNameCtrl, _streetCtrl, _cityCtrl, _zipCtrl,
+      _fullNameCtrl, _streetCtrl, _cityCtrl,
       _telegramCtrl, _phoneCtrl, _cardNumberCtrl, _expiryCtrl, _cvcCtrl,
     ]) {
       c.dispose();
@@ -48,23 +48,51 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
   void _placeOrder() {
     if (!_formKey.currentState!.validate()) return;
+
+    final form = CheckoutFormModel(
+      fullName: _fullNameCtrl.text,
+      streetAddress: _streetCtrl.text,
+      city: _cityCtrl.text,
+      telegram: _telegramCtrl.text,
+      phone: _phoneCtrl.text,
+      paymentMethod: _form.paymentMethod,
+      cardNumber: _cardNumberCtrl.text,
+      expiry: _expiryCtrl.text,
+      cvc: _cvcCtrl.text,
+      localBank: _form.localBank,
+    );
+
+    final order = OrderModel(
+      orderId: DateTime.now().millisecondsSinceEpoch.toString(),
+      timestamp: DateTime.now(),
+      status: OrderStatus.pending,
+      items: cartProducts(),
+      total: _totalAmount,
+      form: form,
+    );
+
+    orderHistoryNotifier.value = [...orderHistoryNotifier.value, order];
+    cartIdsNotifier.value = <String>[];
+
+    final theme = Theme.of(context);
+    final onSurface = theme.colorScheme.onSurface;
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        backgroundColor: _surface,
+        backgroundColor: theme.cardColor,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Row(
+        title: Row(
           children: [
-            Icon(Icons.check_circle_rounded, color: _accent, size: 28),
-            SizedBox(width: 10),
+            Icon(Icons.check_circle_rounded, color: theme.colorScheme.primary, size: 28),
+            const SizedBox(width: 10),
             Text('Order Placed!',
                 style: TextStyle(
-                    color: Colors.white, fontWeight: FontWeight.w700)),
+                    color: onSurface, fontWeight: FontWeight.w700)),
           ],
         ),
-        content: const Text(
+        content: Text(
           'Your order has been placed successfully.\nWe\'ll contact you via Telegram or phone.',
-          style: TextStyle(color: Color(0xFF94A3B8), height: 1.5),
+          style: TextStyle(color: onSurface.withValues(alpha: 0.6), height: 1.5),
         ),
         actions: [
           TextButton(
@@ -72,9 +100,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               Navigator.of(context).pop();
               Navigator.of(context).popUntil((r) => r.isFirst);
             },
-            child: const Text('Back to Home',
+            child: Text('Back to Home',
                 style:
-                    TextStyle(color: _accent, fontWeight: FontWeight.w600)),
+                    TextStyle(color: theme.colorScheme.primary, fontWeight: FontWeight.w600)),
           ),
         ],
       ),
@@ -83,8 +111,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final onSurface = theme.colorScheme.onSurface;
     return Scaffold(
-      backgroundColor: _bg,
+      backgroundColor: theme.scaffoldBackgroundColor,
       resizeToAvoidBottomInset: false,
       bottomNavigationBar: CustomBottomNav(selectedIndex: 4),
       body: Column(
@@ -97,23 +127,23 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   // ── AppBar ────────────────────────────────────────────
                   SliverAppBar(
                     pinned: true,
-                    backgroundColor: _bg,
+                    backgroundColor: theme.scaffoldBackgroundColor,
                     surfaceTintColor: Colors.transparent,
                     leading: GestureDetector(
                       onTap: () => Navigator.pop(context),
                       child: Container(
                         margin: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.07),
+                          color: onSurface.withValues(alpha: 0.07),
                           shape: BoxShape.circle,
                         ),
-                        child: const Icon(Icons.arrow_back_ios_new_rounded,
-                            color: Colors.white, size: 18),
+                        child: Icon(Icons.arrow_back_ios_new_rounded,
+                            color: onSurface, size: 18),
                       ),
                     ),
-                    title: const Text('Checkout',
+                    title: Text('Checkout',
                         style: TextStyle(
-                            color: Colors.white,
+                            color: onSurface,
                             fontSize: 16,
                             fontWeight: FontWeight.w600)),
                     actions: [
@@ -130,11 +160,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text('Checkout',
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 26,
-                                  fontWeight: FontWeight.w800)),
+                          Text('Checkout',
+                              style: theme.textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.w800)),
 
                           const SizedBox(height: 24),
 
@@ -145,7 +172,6 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                             fullNameCtrl: _fullNameCtrl,
                             streetCtrl:   _streetCtrl,
                             cityCtrl:     _cityCtrl,
-                            zipCtrl:      _zipCtrl,
                           ),
 
                           const SizedBox(height: 24),
@@ -169,14 +195,19 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                             label: 'Credit Card',
                           ),
                           _buildPaymentOption(
-                            method: PaymentMethod.applePay,
-                            icon: Icons.apple_rounded,
-                            label: 'Apple Pay',
-                          ),
-                          _buildPaymentOption(
                             method: PaymentMethod.localBank,
                             icon: Icons.account_balance_rounded,
                             label: 'Local Bank',
+                          ),
+                          _buildPaymentOption(
+                            method: PaymentMethod.qrPayment,
+                            icon: Icons.qr_code_scanner_rounded,
+                            label: 'QR Payment',
+                          ),
+                          _buildPaymentOption(
+                            method: PaymentMethod.cashOnDelivery,
+                            icon: Icons.money_rounded,
+                            label: 'Cash on Delivery',
                           ),
 
                           // ── Conditional payment detail panels ──────────
@@ -189,9 +220,18 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                             ),
                           ],
 
-                          if (_form.paymentMethod == PaymentMethod.applePay) ...[
+                          if (_form.paymentMethod == PaymentMethod.qrPayment) ...[
                             const SizedBox(height: 12),
-                            _ApplePayPanel(amount: _totalAmount),
+                            _QrPaymentPanel(
+                              amount: _totalAmount,
+                              screenshotPath: _screenshotPath,
+                              onPickScreenshot: _pickScreenshot,
+                            ),
+                          ],
+
+                          if (_form.paymentMethod == PaymentMethod.cashOnDelivery) ...[
+                            const SizedBox(height: 12),
+                            const _CashOnDeliveryPanel(),
                           ],
 
                           if (_form.paymentMethod == PaymentMethod.localBank) ...[
@@ -201,6 +241,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                               amount: _totalAmount,
                               onBankChanged: (b) =>
                                   setState(() => _form = _form.copyWith(localBank: b)),
+                              screenshotPath: _screenshotPath,
+                              onPickScreenshot: _pickScreenshot,
                             ),
                           ],
 
@@ -219,10 +261,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             padding: EdgeInsets.fromLTRB(
                 20, 14, 20, MediaQuery.of(context).padding.bottom + 14),
             decoration: BoxDecoration(
-              color: _surface,
-              border: Border(
-                  top: BorderSide(
-                      color: Colors.white.withValues(alpha: 0.07))),
+              color: theme.cardColor,
+              border: Border(top: BorderSide(color: theme.dividerColor)),
             ),
             child: SizedBox(
               width: double.infinity,
@@ -274,12 +314,23 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     );
   }
 
+  Future<void> _pickScreenshot() async {
+    final picker = ImagePicker();
+    final file = await picker.pickImage(source: ImageSource.gallery);
+    if (file != null) {
+      setState(() => _screenshotPath = file.path);
+    }
+  }
+
   // ── Single payment option row ─────────────────────────────────────────────
   Widget _buildPaymentOption({
     required PaymentMethod method,
     required IconData icon,
     required String label,
   }) {
+    final theme = Theme.of(context);
+    final onSurface = theme.colorScheme.onSurface;
+    final primary = theme.colorScheme.primary;
     final selected = _form.paymentMethod == method;
     return GestureDetector(
       onTap: () => setState(() => _form = _form.copyWith(paymentMethod: method)),
@@ -288,10 +339,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         margin: const EdgeInsets.only(bottom: 10),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         decoration: BoxDecoration(
-          color: selected ? _accent.withValues(alpha: 0.08) : _surface,
+          color: selected ? primary.withValues(alpha: 0.08) : theme.cardColor,
           borderRadius: BorderRadius.circular(14),
           border: Border.all(
-            color: selected ? _accent : Colors.white.withValues(alpha: 0.08),
+            color: selected ? primary : theme.dividerColor,
             width: selected ? 1.5 : 1,
           ),
         ),
@@ -305,18 +356,18 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: selected ? _accent : _label,
+                  color: selected ? primary : onSurface.withValues(alpha: 0.5),
                   width: selected ? 5 : 2,
                 ),
-                color: selected ? Colors.white : Colors.transparent,
+                color: selected ? theme.scaffoldBackgroundColor : Colors.transparent,
               ),
             ),
             const SizedBox(width: 14),
-            Icon(icon, color: selected ? _accent : _label, size: 22),
+            Icon(icon, color: selected ? primary : onSurface.withValues(alpha: 0.5), size: 22),
             const SizedBox(width: 12),
             Text(label,
                 style: TextStyle(
-                    color: selected ? Colors.white : Colors.white70,
+                    color: selected ? onSurface : onSurface.withValues(alpha: 0.7),
                     fontSize: 15,
                     fontWeight:
                         selected ? FontWeight.w600 : FontWeight.w400)),
@@ -328,113 +379,127 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
-// APPLE PAY PANEL
+// QR PAYMENT PANEL
 // ══════════════════════════════════════════════════════════════════════════════
-class _ApplePayPanel extends StatelessWidget {
+class _QrPaymentPanel extends StatelessWidget {
   final double amount;
-  const _ApplePayPanel({required this.amount});
+  final String? screenshotPath;
+  final VoidCallback onPickScreenshot;
 
-  static const _surface = Color(0xFF0F172A);
+  const _QrPaymentPanel({
+    required this.amount,
+    required this.screenshotPath,
+    required this.onPickScreenshot,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final onSurface = theme.colorScheme.onSurface;
     return Container(
       decoration: BoxDecoration(
-        color: _surface,
+        color: theme.cardColor,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.07)),
+        border: Border.all(color: theme.dividerColor),
       ),
       padding: const EdgeInsets.all(20),
       child: Column(
         children: [
-          // Apple Pay logo row
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.apple_rounded, color: Colors.white, size: 28),
-              const SizedBox(width: 6),
-              const Text('Pay',
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 22,
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: -0.5)),
-            ],
+          Text(
+            'Scan to Pay',
+            style: TextStyle(
+                color: onSurface,
+                fontSize: 18,
+                fontWeight: FontWeight.w600),
           ),
-
-          const SizedBox(height: 20),
-
-          // Mock QR code box
-          Container(
-            width: 160,
-            height: 160,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: const _QrMock(),
-          ),
-
           const SizedBox(height: 16),
-
+          ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: Image.asset(
+              'assets/images/qr_payment.png',
+              width: 200,
+              height: 200,
+              fit: BoxFit.contain,
+              errorBuilder: (_, _, _) => Container(
+                width: 200,
+                height: 200,
+                color: theme.scaffoldBackgroundColor,
+                child: Icon(Icons.qr_code, size: 80, color: onSurface.withValues(alpha: 0.3)),
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
           Text(
             '\$${amount.toStringAsFixed(2)}',
-            style: const TextStyle(
-                color: Colors.white,
+            style: TextStyle(
+                color: onSurface,
                 fontSize: 26,
                 fontWeight: FontWeight.w800),
           ),
-
           const SizedBox(height: 8),
-
           Text(
-            'Scan this QR code with your iPhone\nor open Apple Pay on your device.',
+            'Scan this QR code with your banking app\nto complete the payment.',
             textAlign: TextAlign.center,
             style: TextStyle(
-                color: Colors.white.withValues(alpha: 0.5),
+                color: onSurface.withValues(alpha: 0.5),
                 fontSize: 13,
                 height: 1.5),
           ),
 
-          const SizedBox(height: 16),
+          const SizedBox(height: 20),
 
-          // Steps
-          _ApplePayStep(
-            number: '1',
-            text: 'Open Camera or Wallet app on your iPhone',
+          // Upload screenshot section
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Text('Upload Payment Screenshot',
+                style: TextStyle(
+                    color: onSurface,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600)),
           ),
-          const SizedBox(height: 8),
-          _ApplePayStep(
-            number: '2',
-            text: 'Point at the QR code above',
-          ),
-          const SizedBox(height: 8),
-          _ApplePayStep(
-            number: '3',
-            text: 'Confirm payment with Face ID or Touch ID',
-          ),
-
-          const SizedBox(height: 16),
-
-          // "Or pay with device" button
-          SizedBox(
-            width: double.infinity,
-            child: OutlinedButton.icon(
-              onPressed: () {},
-              icon: const Icon(Icons.apple_rounded,
-                  color: Colors.white, size: 20),
-              label: const Text('Pay with this device',
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600)),
-              style: OutlinedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 14),
-                side: BorderSide(
-                    color: Colors.white.withValues(alpha: 0.2)),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12)),
+          const SizedBox(height: 10),
+          GestureDetector(
+            onTap: onPickScreenshot,
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(vertical: 20),
+              decoration: BoxDecoration(
+                color: theme.scaffoldBackgroundColor,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: theme.dividerColor,
+                  style: BorderStyle.solid,
+                ),
               ),
+              child: screenshotPath != null
+                  ? ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: kIsWeb
+                          ? Image.network(
+                              screenshotPath!,
+                              height: 160,
+                              width: double.infinity,
+                              fit: BoxFit.cover,
+                            )
+                          : Image.file(
+                              File(screenshotPath!),
+                              height: 160,
+                              width: double.infinity,
+                              fit: BoxFit.cover,
+                            ),
+                    )
+                  : Column(
+                      children: [
+                        Icon(Icons.cloud_upload_outlined,
+                            size: 36,
+                            color: onSurface.withValues(alpha: 0.4)),
+                        const SizedBox(height: 8),
+                        Text('Tap to upload receipt',
+                            style: TextStyle(
+                                color: onSurface.withValues(alpha: 0.5),
+                                fontSize: 14)),
+                      ],
+                    ),
             ),
           ),
         ],
@@ -443,65 +508,47 @@ class _ApplePayPanel extends StatelessWidget {
   }
 }
 
-class _ApplePayStep extends StatelessWidget {
-  final String number;
-  final String text;
-  const _ApplePayStep({required this.number, required this.text});
+// ══════════════════════════════════════════════════════════════════════════════
+// CASH ON DELIVERY PANEL
+// ══════════════════════════════════════════════════════════════════════════════
+class _CashOnDeliveryPanel extends StatelessWidget {
+  const _CashOnDeliveryPanel();
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          width: 22,
-          height: 22,
-          decoration: const BoxDecoration(
-            color: Color(0xFF38BDF8),
-            shape: BoxShape.circle,
-          ),
-          child: Center(
-            child: Text(number,
-                style: const TextStyle(
-                    color: Color(0xFF020617),
-                    fontSize: 12,
-                    fontWeight: FontWeight.w700)),
-          ),
-        ),
-        const SizedBox(width: 10),
-        Expanded(
-          child: Text(text,
+    final theme = Theme.of(context);
+    final onSurface = theme.colorScheme.onSurface;
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: theme.cardColor,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: theme.dividerColor),
+      ),
+      child: Column(
+        children: [
+          Icon(Icons.money_rounded,
+              size: 48, color: theme.colorScheme.primary),
+          const SizedBox(height: 12),
+          Text('Pay when your order arrives.',
               style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.6),
-                  fontSize: 13,
-                  height: 1.5)),
-        ),
-      ],
+                  color: onSurface,
+                  fontSize: 15,
+                  fontWeight: FontWeight.w500)),
+          const SizedBox(height: 6),
+          Text(
+            'No additional steps needed. Our delivery team\nwill collect the payment at your doorstep.',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+                color: onSurface.withValues(alpha: 0.5),
+                fontSize: 13,
+                height: 1.5),
+          ),
+        ],
+      ),
     );
   }
-}
-
-/// Draws a minimal pixel-art QR pattern (purely decorative).
-class _QrMock extends StatelessWidget {
-  const _QrMock();
-
-  @override
-  Widget build(BuildContext context) {
-    return CustomPaint(
-      painter: _QrPainter(),
-      child: const SizedBox(width: 160, height: 160),
-    );
-  }
-}
-
-class _QrPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-
-  }
-
-  @override
-  bool shouldRepaint(_) => false;
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -511,14 +558,16 @@ class _LocalBankPanel extends StatelessWidget {
   final LocalBank selectedBank;
   final double amount;
   final ValueChanged<LocalBank> onBankChanged;
+  final String? screenshotPath;
+  final VoidCallback onPickScreenshot;
 
   const _LocalBankPanel({
     required this.selectedBank,
     required this.amount,
     required this.onBankChanged,
+    required this.screenshotPath,
+    required this.onPickScreenshot,
   });
-
-  static const _surface = Color(0xFF0F172A);
 
   // Bank metadata
   static const _banks = [
@@ -544,13 +593,15 @@ class _LocalBankPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final onSurface = theme.colorScheme.onSurface;
     final meta = _banks.firstWhere((b) => b.bank == selectedBank);
 
     return Container(
       decoration: BoxDecoration(
-        color: _surface,
+        color: theme.cardColor,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.07)),
+        border: Border.all(color: theme.dividerColor),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -572,12 +623,12 @@ class _LocalBankPanel extends StatelessWidget {
                       decoration: BoxDecoration(
                         color: active
                             ? b.color.withValues(alpha: 0.15)
-                            : Colors.white.withValues(alpha: 0.04),
+                            : onSurface.withValues(alpha: 0.04),
                         borderRadius: BorderRadius.circular(10),
                         border: Border.all(
                           color: active
                               ? b.color
-                              : Colors.white.withValues(alpha: 0.08),
+                              : theme.dividerColor,
                           width: active ? 1.5 : 1,
                         ),
                       ),
@@ -606,7 +657,7 @@ class _LocalBankPanel extends StatelessWidget {
                           Text(
                             b.shortCode,
                             style: TextStyle(
-                                color: active ? Colors.white : Colors.white60,
+                                color: active ? onSurface : onSurface.withValues(alpha: 0.5),
                                 fontSize: 13,
                                 fontWeight: active
                                     ? FontWeight.w700
@@ -650,7 +701,6 @@ class _LocalBankPanel extends StatelessWidget {
                 _BankDetailRow(
                   label: 'Amount',
                   value: '\$${amount.toStringAsFixed(2)}',
-                  valueColor: Colors.white,
                   valueBold: true,
                 ),
               ],
@@ -658,7 +708,7 @@ class _LocalBankPanel extends StatelessWidget {
           ),
 
           const SizedBox(height: 16),
-          Divider(height: 1, color: Colors.white.withValues(alpha: 0.06)),
+          Divider(height: 1, color: theme.dividerColor),
 
           // ── Instructions ─────────────────────────────────────────────
           Padding(
@@ -666,9 +716,9 @@ class _LocalBankPanel extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('How to pay',
+                Text('How to pay',
                     style: TextStyle(
-                        color: Colors.white,
+                        color: onSurface,
                         fontSize: 14,
                         fontWeight: FontWeight.w600)),
                 const SizedBox(height: 10),
@@ -693,36 +743,63 @@ class _LocalBankPanel extends StatelessWidget {
                 _BankStep(
                     n: '5',
                     text:
-                        'Send us the transfer receipt via Telegram or phone'),
-                const SizedBox(height: 12),
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFFBBF24).withValues(alpha: 0.08),
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(
-                        color: const Color(0xFFFBBF24)
-                            .withValues(alpha: 0.25)),
-                  ),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Icon(Icons.info_outline_rounded,
-                          color: Color(0xFFFBBF24), size: 16),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          'Your order will be confirmed after we verify your payment receipt.',
-                          style: TextStyle(
-                              color: const Color(0xFFFBBF24)
-                                  .withValues(alpha: 0.85),
-                              fontSize: 12,
-                              height: 1.5),
-                        ),
+                        'Upload the transfer receipt below'),
+
+                const SizedBox(height: 16),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text('Upload Payment Screenshot',
+                      style: TextStyle(
+                          color: onSurface,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600)),
+                ),
+                const SizedBox(height: 10),
+                GestureDetector(
+                  onTap: onPickScreenshot,
+                  child: Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(vertical: 20),
+                    decoration: BoxDecoration(
+                      color: theme.scaffoldBackgroundColor,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: theme.dividerColor,
+                        style: BorderStyle.solid,
                       ),
-                    ],
+                    ),
+                    child: screenshotPath != null
+                        ? ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: kIsWeb
+                                ? Image.network(
+                                    screenshotPath!,
+                                    height: 160,
+                                    width: double.infinity,
+                                    fit: BoxFit.cover,
+                                  )
+                                : Image.file(
+                                    File(screenshotPath!),
+                                    height: 160,
+                                    width: double.infinity,
+                                    fit: BoxFit.cover,
+                                  ),
+                          )
+                        : Column(
+                            children: [
+                              Icon(Icons.cloud_upload_outlined,
+                                  size: 36,
+                                  color: onSurface.withValues(alpha: 0.4)),
+                              const SizedBox(height: 8),
+                              Text('Tap to upload receipt',
+                                  style: TextStyle(
+                                      color: onSurface.withValues(alpha: 0.5),
+                                      fontSize: 14)),
+                            ],
+                          ),
                   ),
                 ),
+
               ],
             ),
           ),
@@ -735,31 +812,31 @@ class _LocalBankPanel extends StatelessWidget {
 class _BankDetailRow extends StatelessWidget {
   final String label;
   final String value;
-  final Color? valueColor;
   final bool valueBold;
   final bool isCopiable;
 
   const _BankDetailRow({
     required this.label,
     required this.value,
-    this.valueColor,
     this.valueBold = false,
     this.isCopiable = false,
   });
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final onSurface = theme.colorScheme.onSurface;
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(label,
-            style: const TextStyle(
-                color: Color(0xFF64748B), fontSize: 13)),
+            style: TextStyle(
+                color: onSurface.withValues(alpha: 0.5), fontSize: 13)),
         Row(
           children: [
             Text(value,
                 style: TextStyle(
-                    color: valueColor ?? Colors.white70,
+                    color: onSurface,
                     fontSize: 13,
                     fontWeight: valueBold
                         ? FontWeight.w700
@@ -772,7 +849,7 @@ class _BankDetailRow extends StatelessWidget {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: const Text('Account number copied'),
-                      backgroundColor: const Color(0xFF0F172A),
+                      backgroundColor: theme.cardColor,
                       behavior: SnackBarBehavior.floating,
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10)),
@@ -798,18 +875,20 @@ class _BankStep extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final onSurface = theme.colorScheme.onSurface;
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
           width: 20,
           height: 20,
-          decoration: const BoxDecoration(
-              color: Color(0xFF1E293B), shape: BoxShape.circle),
+          decoration: BoxDecoration(
+              color: onSurface.withValues(alpha: 0.15), shape: BoxShape.circle),
           child: Center(
             child: Text(n,
-                style: const TextStyle(
-                    color: Color(0xFF94A3B8),
+                style: TextStyle(
+                    color: onSurface.withValues(alpha: 0.6),
                     fontSize: 11,
                     fontWeight: FontWeight.w700)),
           ),
@@ -818,7 +897,7 @@ class _BankStep extends StatelessWidget {
         Expanded(
           child: Text(text,
               style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.55),
+                  color: onSurface.withValues(alpha: 0.55),
                   fontSize: 12,
                   height: 1.5)),
         ),
@@ -835,24 +914,30 @@ class _SectionTitle extends StatelessWidget {
   final String text;
   const _SectionTitle(this.text);
   @override
-  Widget build(BuildContext context) => Text(text,
-      style: const TextStyle(
-          color: Colors.white, fontSize: 17, fontWeight: FontWeight.w700));
+  Widget build(BuildContext context) {
+    final onSurface = Theme.of(context).colorScheme.onSurface;
+    return Text(text,
+        style: TextStyle(
+            color: onSurface, fontSize: 17, fontWeight: FontWeight.w700));
+  }
 }
 
 class _AppBarIcon extends StatelessWidget {
   final IconData icon;
   const _AppBarIcon(this.icon);
   @override
-  Widget build(BuildContext context) => Container(
-        margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
-        padding: const EdgeInsets.all(7),
-        decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.07),
-          shape: BoxShape.circle,
-        ),
-        child: Icon(icon, color: Colors.white, size: 18),
-      );
+  Widget build(BuildContext context) {
+    final onSurface = Theme.of(context).colorScheme.onSurface;
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+      padding: const EdgeInsets.all(7),
+      decoration: BoxDecoration(
+        color: onSurface.withValues(alpha: 0.07),
+        shape: BoxShape.circle,
+      ),
+      child: Icon(icon, color: onSurface, size: 18),
+    );
+  }
 }
 
 // ── Address card ──────────────────────────────────────────────────────────────
@@ -860,22 +945,21 @@ class _AddressCard extends StatelessWidget {
   final TextEditingController fullNameCtrl;
   final TextEditingController streetCtrl;
   final TextEditingController cityCtrl;
-  final TextEditingController zipCtrl;
 
   const _AddressCard({
     required this.fullNameCtrl,
     required this.streetCtrl,
     required this.cityCtrl,
-    required this.zipCtrl,
   });
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFF0F172A),
+        color: theme.cardColor,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.07)),
+        border: Border.all(color: theme.dividerColor),
       ),
       child: Column(
         children: [
@@ -883,20 +967,7 @@ class _AddressCard extends StatelessWidget {
           _Divider(),
           _FormField(controller: streetCtrl, hint: 'Street Address'),
           _Divider(),
-          Row(
-            children: [
-              Expanded(child: _FormField(controller: cityCtrl, hint: 'City')),
-              _VertDivider(),
-              Expanded(
-                child: _FormField(
-                  controller: zipCtrl,
-                  hint: 'ZIP',
-                  keyboardType: TextInputType.number,
-                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                ),
-              ),
-            ],
-          ),
+          _FormField(controller: cityCtrl, hint: 'City'),
         ],
       ),
     );
@@ -912,11 +983,12 @@ class _ContactCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFF0F172A),
+        color: theme.cardColor,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.07)),
+        border: Border.all(color: theme.dividerColor),
       ),
       child: Column(
         children: [
@@ -968,11 +1040,12 @@ class _CardDetailsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFF0F172A),
+        color: theme.cardColor,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.07)),
+        border: Border.all(color: theme.dividerColor),
       ),
       child: Column(
         children: [
@@ -1054,6 +1127,8 @@ class _FormField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final onSurface = theme.colorScheme.onSurface;
     return TextFormField(
       controller: controller,
       keyboardType: keyboardType,
@@ -1061,12 +1136,12 @@ class _FormField extends StatelessWidget {
       obscureText: obscureText,
       validator: validator ??
           (v) => (v == null || v.trim().isEmpty) ? '$hint is required' : null,
-      style: const TextStyle(color: Colors.white, fontSize: 14),
+      style: TextStyle(color: onSurface, fontSize: 14),
       decoration: InputDecoration(
         hintText: hint,
-        hintStyle: const TextStyle(color: Color(0xFF475569), fontSize: 14),
+        hintStyle: TextStyle(color: onSurface.withValues(alpha: 0.4), fontSize: 14),
         prefixIcon: prefixIcon != null
-            ? Icon(prefixIcon, color: const Color(0xFF38BDF8), size: 20)
+            ? Icon(prefixIcon, color: theme.colorScheme.primary, size: 20)
             : null,
         border: InputBorder.none,
         contentPadding:
@@ -1083,13 +1158,13 @@ class _FormField extends StatelessWidget {
 class _Divider extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Divider(
-      height: 1, thickness: 1, color: Colors.white.withValues(alpha: 0.06));
+      height: 1, thickness: 1, color: Theme.of(context).dividerColor);
 }
 
 class _VertDivider extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Container(
-      width: 1, height: 52, color: Colors.white.withValues(alpha: 0.06));
+      width: 1, height: 52, color: Theme.of(context).dividerColor);
 }
 
 // ── Input formatters ──────────────────────────────────────────────────────────

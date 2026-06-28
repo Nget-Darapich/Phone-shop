@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:phone_shop/core/router/app_router.dart';
 import 'package:phone_shop/core/widgets/custom_bottom_nav.dart';
+import '../../../data/models/product_model.dart';
 
 class FavoriteScreen extends StatelessWidget {
   const FavoriteScreen({super.key});
@@ -7,20 +9,127 @@ class FavoriteScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        elevation: 0,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: Theme.of(context).iconTheme.color),
+          onPressed: () => Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false),
+        ),
         title: const Text("Favorites"),
       ),
+      body: ValueListenableBuilder<Set<String>>(
+        valueListenable: favoriteIdsNotifier,
+        builder: (context, favorites, _) {
+          final items = sampleProducts
+              .where((phone) => favorites.contains(phone.id))
+              .toList();
 
-      body: const Center(
-        child: Text(
-          "Favorite Screen",
-        ),
+          if (items.isEmpty) {
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Text(
+                  'No favorites yet. Tap the heart icon on a product to save it.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                    fontSize: 16,
+                  ),
+                ),
+              ),
+            );
+          }
+
+          return ListView.separated(
+            padding: const EdgeInsets.all(20),
+            itemCount: items.length,
+            separatorBuilder: (_, _) => const SizedBox(height: 16),
+            itemBuilder: (context, index) {
+              final phone = items[index];
+              return InkWell(
+                borderRadius: BorderRadius.circular(18),
+                onTap: () => Navigator.pushNamed(
+                  context,
+                  AppRouter.product(phone.id),
+                ),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF0F172A),
+                    borderRadius: BorderRadius.circular(18),
+                    border: Border.all(color: Color.fromRGBO(255, 255, 255, 0.08)),
+                  ),
+                  padding: const EdgeInsets.all(16),
+                  child: Row(
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(14),
+                        child: Image.asset(
+                          phone.image,
+                          width: 80,
+                          height: 80,
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, _, _) => Container(
+                            width: 80,
+                            height: 80,
+                            color: const Color(0xFF1E293B),
+                            child: const Icon(Icons.phone_android,
+                                color: Color(0xFF64748B)),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              phone.name,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              phone.brand.name[0].toUpperCase() + phone.brand.name.substring(1),
+                              style: TextStyle(
+                                color: Colors.white.withValues(alpha: 0.65),
+                                fontSize: 13,
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            Text(
+                              '\$${phone.price.toStringAsFixed(0)}',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w800,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: () => toggleFavorite(phone),
+                        icon: const Icon(
+                          Icons.favorite,
+                          color: Colors.red,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          );
+        },
       ),
-      bottomNavigationBar:
-        CustomBottomNav(
-          selectedIndex:2,
-        ),
+      bottomNavigationBar: const CustomBottomNav(
+        selectedIndex: 2,
+      ),
     );
   }
 }

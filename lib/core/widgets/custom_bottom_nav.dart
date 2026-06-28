@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:phone_shop/data/models/product_model.dart';
 import '../router/app_router.dart';
 
 class CustomBottomNav extends StatelessWidget {
@@ -30,7 +31,7 @@ class CustomBottomNav extends StatelessWidget {
           // Home
           IconButton(
             onPressed: () {
-              Navigator.pushNamed(context, AppRouter.home);
+              Navigator.pushNamedAndRemoveUntil(context, AppRouter.home, (route) => false);
             },
 
             icon: SvgPicture.asset(
@@ -44,27 +45,54 @@ class CustomBottomNav extends StatelessWidget {
             ),
           ),
 
-          // Compare
-          IconButton(
-            onPressed: () {
-              Navigator.pushNamed(context, AppRouter.compare);
-            },
-
-            icon: SvgPicture.asset(
-              "assets/icons/compare_icon.svg",
-              width: 20,
-              height: 20,
-              colorFilter: ColorFilter.mode(
-                selectedIndex == 1 ? Colors.cyan : Colors.grey,
-                BlendMode.srcIn,
-              ),
+          // Compare (with badge)
+          GestureDetector(
+            onTap: () => Navigator.pushNamedAndRemoveUntil(context, AppRouter.compare, (route) => false),
+            child: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: SvgPicture.asset(
+                    "assets/icons/compare_icon.svg",
+                    width: 20,
+                    height: 20,
+                    colorFilter: ColorFilter.mode(
+                      selectedIndex == 1 ? Colors.cyan : Colors.grey,
+                      BlendMode.srcIn,
+                    ),
+                  ),
+                ),
+                Positioned(
+                  right: 2,
+                  top: 2,
+                  child: ValueListenableBuilder<Set<String>>(
+                    valueListenable: compareIdsNotifier,
+                    builder: (context, compareIds, _) {
+                      final count = compareIds.length;
+                      if (count == 0) return const SizedBox.shrink();
+                      return Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: Colors.red,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          count.toString(),
+                          style: const TextStyle(color: Colors.white, fontSize: 10),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
             ),
           ),
 
           // Favorite
           IconButton(
             onPressed: () {
-              Navigator.pushNamed(context, AppRouter.favorite);
+              Navigator.pushNamedAndRemoveUntil(context, AppRouter.favorite, (route) => false);
             },
 
             icon: SvgPicture.asset(
@@ -78,27 +106,52 @@ class CustomBottomNav extends StatelessWidget {
             ),
           ),
 
-          // Cart
-          IconButton(
-            onPressed: () {
-              Navigator.pushNamed(context, AppRouter.cart);
-            },
-
-            icon: SvgPicture.asset(
-              "assets/icons/cart_icon.svg",
-              width: 20,
-              height: 20,
-              colorFilter: ColorFilter.mode(
-                selectedIndex == 3 ? Colors.cyan : Colors.grey,
-                BlendMode.srcIn,
-              ),
+          // Cart (with badge)
+          GestureDetector(
+            onTap: () => Navigator.pushNamedAndRemoveUntil(context, AppRouter.cart, (route) => false),
+            child: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                SvgPicture.asset(
+                  "assets/icons/cart_icon.svg",
+                  width: 20,
+                  height: 20,
+                  colorFilter: ColorFilter.mode(
+                    selectedIndex == 3 ? Colors.cyan : Colors.grey,
+                    BlendMode.srcIn,
+                  ),
+                ),
+                Positioned(
+                  right: -8,
+                  top: -8,
+                  child: ValueListenableBuilder<List<String>>(
+                    valueListenable: cartIdsNotifier,
+                    builder: (context, cartIds, _) {
+                      final count = cartIds.length;
+                      if (count == 0) return const SizedBox.shrink();
+                      final display = count > 99 ? '99+' : count.toString();
+                      return Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: Colors.red,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          display,
+                          style: const TextStyle(color: Colors.white, fontSize: 10),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
             ),
           ),
 
           // Profile/More
           IconButton(
             onPressed: () {
-              Navigator.pushNamed(context, AppRouter.more);
+              Navigator.pushNamedAndRemoveUntil(context, AppRouter.more, (route) => false);
             },
 
             icon: SvgPicture.asset(

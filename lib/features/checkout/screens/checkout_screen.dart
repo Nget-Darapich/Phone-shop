@@ -1,5 +1,8 @@
+import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:image_picker/image_picker.dart';
 import '../../../core/widgets/custom_bottom_nav.dart';
 import '../../../data/models/checkout_model.dart';
 import '../../../data/models/order_model.dart';
@@ -24,6 +27,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   final _expiryCtrl     = TextEditingController();
   final _cvcCtrl        = TextEditingController();
   final _formKey        = GlobalKey<FormState>();
+  String? _screenshotPath;
 
   @override
   void dispose() {
@@ -191,14 +195,19 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                             label: 'Credit Card',
                           ),
                           _buildPaymentOption(
-                            method: PaymentMethod.applePay,
-                            icon: Icons.apple_rounded,
-                            label: 'Apple Pay',
-                          ),
-                          _buildPaymentOption(
                             method: PaymentMethod.localBank,
                             icon: Icons.account_balance_rounded,
                             label: 'Local Bank',
+                          ),
+                          _buildPaymentOption(
+                            method: PaymentMethod.qrPayment,
+                            icon: Icons.qr_code_scanner_rounded,
+                            label: 'QR Payment',
+                          ),
+                          _buildPaymentOption(
+                            method: PaymentMethod.cashOnDelivery,
+                            icon: Icons.money_rounded,
+                            label: 'Cash on Delivery',
                           ),
 
                           // ── Conditional payment detail panels ──────────
@@ -211,9 +220,18 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                             ),
                           ],
 
-                          if (_form.paymentMethod == PaymentMethod.applePay) ...[
+                          if (_form.paymentMethod == PaymentMethod.qrPayment) ...[
                             const SizedBox(height: 12),
-                            _ApplePayPanel(amount: _totalAmount),
+                            _QrPaymentPanel(
+                              amount: _totalAmount,
+                              screenshotPath: _screenshotPath,
+                              onPickScreenshot: _pickScreenshot,
+                            ),
+                          ],
+
+                          if (_form.paymentMethod == PaymentMethod.cashOnDelivery) ...[
+                            const SizedBox(height: 12),
+                            const _CashOnDeliveryPanel(),
                           ],
 
                           if (_form.paymentMethod == PaymentMethod.localBank) ...[
@@ -223,6 +241,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                               amount: _totalAmount,
                               onBankChanged: (b) =>
                                   setState(() => _form = _form.copyWith(localBank: b)),
+                              screenshotPath: _screenshotPath,
+                              onPickScreenshot: _pickScreenshot,
                             ),
                           ],
 
@@ -294,6 +314,14 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     );
   }
 
+  Future<void> _pickScreenshot() async {
+    final picker = ImagePicker();
+    final file = await picker.pickImage(source: ImageSource.gallery);
+    if (file != null) {
+      setState(() => _screenshotPath = file.path);
+    }
+  }
+
   // ── Single payment option row ─────────────────────────────────────────────
   Widget _buildPaymentOption({
     required PaymentMethod method,
@@ -351,11 +379,18 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
-// APPLE PAY PANEL
+// QR PAYMENT PANEL
 // ══════════════════════════════════════════════════════════════════════════════
-class _ApplePayPanel extends StatelessWidget {
+class _QrPaymentPanel extends StatelessWidget {
   final double amount;
-  const _ApplePayPanel({required this.amount});
+  final String? screenshotPath;
+  final VoidCallback onPickScreenshot;
+
+  const _QrPaymentPanel({
+    required this.amount,
+    required this.screenshotPath,
+    required this.onPickScreenshot,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -370,36 +405,30 @@ class _ApplePayPanel extends StatelessWidget {
       padding: const EdgeInsets.all(20),
       child: Column(
         children: [
-          // Apple Pay logo row
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.apple_rounded, color: onSurface, size: 28),
-              const SizedBox(width: 6),
-              Text('Pay',
-                  style: TextStyle(
-                      color: onSurface,
-                      fontSize: 22,
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: -0.5)),
-            ],
+          Text(
+            'Scan to Pay',
+            style: TextStyle(
+                color: onSurface,
+                fontSize: 18,
+                fontWeight: FontWeight.w600),
           ),
-
-          const SizedBox(height: 20),
-
-          // Mock QR code box
-          Container(
-            width: 160,
-            height: 160,
-            decoration: BoxDecoration(
-              color: theme.scaffoldBackgroundColor,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: const _QrMock(),
-          ),
-
           const SizedBox(height: 16),
-
+          ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: Image.asset(
+              'assets/images/qr_payment.png',
+              width: 200,
+              height: 200,
+              fit: BoxFit.contain,
+              errorBuilder: (_, _, _) => Container(
+                width: 200,
+                height: 200,
+                color: theme.scaffoldBackgroundColor,
+                child: Icon(Icons.qr_code, size: 80, color: onSurface.withValues(alpha: 0.3)),
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
           Text(
             '\$${amount.toStringAsFixed(2)}',
             style: TextStyle(
@@ -407,11 +436,9 @@ class _ApplePayPanel extends StatelessWidget {
                 fontSize: 26,
                 fontWeight: FontWeight.w800),
           ),
-
           const SizedBox(height: 8),
-
           Text(
-            'Scan this QR code with your iPhone\nor open Apple Pay on your device.',
+            'Scan this QR code with your banking app\nto complete the payment.',
             textAlign: TextAlign.center,
             style: TextStyle(
                 color: onSurface.withValues(alpha: 0.5),
@@ -419,41 +446,60 @@ class _ApplePayPanel extends StatelessWidget {
                 height: 1.5),
           ),
 
-          const SizedBox(height: 16),
+          const SizedBox(height: 20),
 
-          _ApplePayStep(
-            number: '1',
-            text: 'Open Camera or Wallet app on your iPhone',
+          // Upload screenshot section
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Text('Upload Payment Screenshot',
+                style: TextStyle(
+                    color: onSurface,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600)),
           ),
-          const SizedBox(height: 8),
-          _ApplePayStep(
-            number: '2',
-            text: 'Point at the QR code above',
-          ),
-          const SizedBox(height: 8),
-          _ApplePayStep(
-            number: '3',
-            text: 'Confirm payment with Face ID or Touch ID',
-          ),
-
-          const SizedBox(height: 16),
-
-          SizedBox(
-            width: double.infinity,
-            child: OutlinedButton.icon(
-              onPressed: () {},
-              icon: Icon(Icons.apple_rounded, color: onSurface, size: 20),
-              label: Text('Pay with this device',
-                  style: TextStyle(
-                      color: onSurface,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600)),
-              style: OutlinedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 14),
-                side: BorderSide(color: theme.dividerColor),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12)),
+          const SizedBox(height: 10),
+          GestureDetector(
+            onTap: onPickScreenshot,
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(vertical: 20),
+              decoration: BoxDecoration(
+                color: theme.scaffoldBackgroundColor,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: theme.dividerColor,
+                  style: BorderStyle.solid,
+                ),
               ),
+              child: screenshotPath != null
+                  ? ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: kIsWeb
+                          ? Image.network(
+                              screenshotPath!,
+                              height: 160,
+                              width: double.infinity,
+                              fit: BoxFit.cover,
+                            )
+                          : Image.file(
+                              File(screenshotPath!),
+                              height: 160,
+                              width: double.infinity,
+                              fit: BoxFit.cover,
+                            ),
+                    )
+                  : Column(
+                      children: [
+                        Icon(Icons.cloud_upload_outlined,
+                            size: 36,
+                            color: onSurface.withValues(alpha: 0.4)),
+                        const SizedBox(height: 8),
+                        Text('Tap to upload receipt',
+                            style: TextStyle(
+                                color: onSurface.withValues(alpha: 0.5),
+                                fontSize: 14)),
+                      ],
+                    ),
             ),
           ),
         ],
@@ -462,67 +508,47 @@ class _ApplePayPanel extends StatelessWidget {
   }
 }
 
-class _ApplePayStep extends StatelessWidget {
-  final String number;
-  final String text;
-  const _ApplePayStep({required this.number, required this.text});
+// ══════════════════════════════════════════════════════════════════════════════
+// CASH ON DELIVERY PANEL
+// ══════════════════════════════════════════════════════════════════════════════
+class _CashOnDeliveryPanel extends StatelessWidget {
+  const _CashOnDeliveryPanel();
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final onSurface = theme.colorScheme.onSurface;
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          width: 22,
-          height: 22,
-          decoration: BoxDecoration(
-            color: theme.colorScheme.primary,
-            shape: BoxShape.circle,
-          ),
-          child: Center(
-            child: Text(number,
-                style: TextStyle(
-                    color: theme.colorScheme.onPrimary,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w700)),
-          ),
-        ),
-        const SizedBox(width: 10),
-        Expanded(
-          child: Text(text,
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: theme.cardColor,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: theme.dividerColor),
+      ),
+      child: Column(
+        children: [
+          Icon(Icons.money_rounded,
+              size: 48, color: theme.colorScheme.primary),
+          const SizedBox(height: 12),
+          Text('Pay when your order arrives.',
               style: TextStyle(
-                  color: onSurface.withValues(alpha: 0.6),
-                  fontSize: 13,
-                  height: 1.5)),
-        ),
-      ],
+                  color: onSurface,
+                  fontSize: 15,
+                  fontWeight: FontWeight.w500)),
+          const SizedBox(height: 6),
+          Text(
+            'No additional steps needed. Our delivery team\nwill collect the payment at your doorstep.',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+                color: onSurface.withValues(alpha: 0.5),
+                fontSize: 13,
+                height: 1.5),
+          ),
+        ],
+      ),
     );
   }
-}
-
-/// Draws a minimal pixel-art QR pattern (purely decorative).
-class _QrMock extends StatelessWidget {
-  const _QrMock();
-
-  @override
-  Widget build(BuildContext context) {
-    return CustomPaint(
-      painter: _QrPainter(),
-      child: const SizedBox(width: 160, height: 160),
-    );
-  }
-}
-
-class _QrPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-
-  }
-
-  @override
-  bool shouldRepaint(_) => false;
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -532,11 +558,15 @@ class _LocalBankPanel extends StatelessWidget {
   final LocalBank selectedBank;
   final double amount;
   final ValueChanged<LocalBank> onBankChanged;
+  final String? screenshotPath;
+  final VoidCallback onPickScreenshot;
 
   const _LocalBankPanel({
     required this.selectedBank,
     required this.amount,
     required this.onBankChanged,
+    required this.screenshotPath,
+    required this.onPickScreenshot,
   });
 
   // Bank metadata
@@ -713,35 +743,63 @@ class _LocalBankPanel extends StatelessWidget {
                 _BankStep(
                     n: '5',
                     text:
-                        'Send us the transfer receipt via Telegram or phone'),
-                const SizedBox(height: 12),
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFFBBF24).withValues(alpha: 0.08),
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(
-                        color: const Color(0xFFFBBF24)
-                            .withValues(alpha: 0.25)),
-                  ),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Icon(Icons.info_outline_rounded,
-                          color: Color(0xFFFBBF24), size: 16),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child:                   Text(
-                          'Your order will be confirmed after we verify your payment receipt.',
-                          style: TextStyle(
-                              color: const Color(0xFFFBBF24).withValues(alpha: 0.85),
-                              fontSize: 12,
-                              height: 1.5),
-                        ),
+                        'Upload the transfer receipt below'),
+
+                const SizedBox(height: 16),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text('Upload Payment Screenshot',
+                      style: TextStyle(
+                          color: onSurface,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600)),
+                ),
+                const SizedBox(height: 10),
+                GestureDetector(
+                  onTap: onPickScreenshot,
+                  child: Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(vertical: 20),
+                    decoration: BoxDecoration(
+                      color: theme.scaffoldBackgroundColor,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: theme.dividerColor,
+                        style: BorderStyle.solid,
                       ),
-                    ],
+                    ),
+                    child: screenshotPath != null
+                        ? ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: kIsWeb
+                                ? Image.network(
+                                    screenshotPath!,
+                                    height: 160,
+                                    width: double.infinity,
+                                    fit: BoxFit.cover,
+                                  )
+                                : Image.file(
+                                    File(screenshotPath!),
+                                    height: 160,
+                                    width: double.infinity,
+                                    fit: BoxFit.cover,
+                                  ),
+                          )
+                        : Column(
+                            children: [
+                              Icon(Icons.cloud_upload_outlined,
+                                  size: 36,
+                                  color: onSurface.withValues(alpha: 0.4)),
+                              const SizedBox(height: 8),
+                              Text('Tap to upload receipt',
+                                  style: TextStyle(
+                                      color: onSurface.withValues(alpha: 0.5),
+                                      fontSize: 14)),
+                            ],
+                          ),
                   ),
                 ),
+
               ],
             ),
           ),

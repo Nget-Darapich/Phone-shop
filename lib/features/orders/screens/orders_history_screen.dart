@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/router/app_router.dart';
 import '../../../data/models/order_model.dart';
 
 class OrdersHistoryScreen extends StatelessWidget {
@@ -115,9 +116,15 @@ class _OrderCard extends StatelessWidget {
       child: Material(
         color: Colors.transparent,
         borderRadius: BorderRadius.circular(12),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
+        child: InkWell(
+          borderRadius: BorderRadius.circular(12),
+          onTap: () => Navigator.of(context).pushNamed(
+            AppRouter.orderDetail,
+            arguments: order,
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
@@ -180,6 +187,7 @@ class _OrderCard extends StatelessWidget {
             ],
           ),
         ),
+      ),
       ),
     );
   }

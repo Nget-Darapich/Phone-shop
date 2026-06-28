@@ -15,9 +15,7 @@ class MoreScreen extends StatelessWidget {
         elevation: 0,
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Theme.of(context).iconTheme.color),
-          onPressed: () {
-            Navigator.pop(context);
-          },
+          onPressed: () => Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false),
         ),
         title: Text(
           'Account',

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:phone_shop/data/models/product_model.dart';
+import 'package:phone_shop/data/models/order_model.dart';
 import 'package:phone_shop/features/auth/screens/auth_screen.dart';
 import 'package:phone_shop/features/home/screens/home_screen.dart';
 import 'package:phone_shop/features/favorites/screens/favorite_screen.dart';
@@ -18,6 +19,7 @@ import 'package:phone_shop/features/compare/screens/compare_screen.dart';
 import 'package:phone_shop/features/product/screens/product_detail_screen.dart';
 import 'package:phone_shop/features/checkout/screens/checkout_screen.dart';
 import 'package:phone_shop/features/orders/screens/orders_history_screen.dart';
+import 'package:phone_shop/features/orders/screens/order_detail_screen.dart';
 class AppRouter {
   static const String home = '/';
   static String product(String id) => '/product/$id';
@@ -40,6 +42,7 @@ class AppRouter {
   static const String supportChat = '/support_chat';
   static const String productList = '/product_list';
   static const String ordersHistory = '/orders_history';
+  static const String orderDetail = '/order_detail';
 
   /// All available route names in the app.
   static final Set<String> availableRoutes = {
@@ -62,6 +65,7 @@ class AppRouter {
     bookAppointment,
     supportChat,
     ordersHistory,
+    orderDetail,
   };
 
   static Route<dynamic> onGenerateRoute(RouteSettings settings) {
@@ -142,6 +146,18 @@ class AppRouter {
         return MaterialPageRoute(
           builder: (_) => const OrdersHistoryScreen(),
           settings: settings,
+        );
+
+      case orderDetail:
+        final order = settings.arguments;
+        if (order is OrderModel) {
+          return MaterialPageRoute(
+            builder: (_) => OrderDetailScreen(order: order),
+            settings: settings,
+          );
+        }
+        return MaterialPageRoute(
+          builder: (_) => const Scaffold(body: Center(child: Text('Order not found'))),
         );
 
       case productList:

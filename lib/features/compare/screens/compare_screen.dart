@@ -12,6 +12,10 @@ class CompareScreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: Theme.of(context).iconTheme.color),
+          onPressed: () => Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false),
+        ),
         title: const Text('Compare'),
       ),
       bottomNavigationBar: const CustomBottomNav(selectedIndex: 1),

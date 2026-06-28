@@ -13,6 +13,12 @@ class CartScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        elevation: 0,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: Theme.of(context).iconTheme.color),
+          onPressed: () => Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false),
+        ),
         title: const Text('Shopping Cart'),
       ),
       bottomNavigationBar: const CustomBottomNav(selectedIndex: 3),

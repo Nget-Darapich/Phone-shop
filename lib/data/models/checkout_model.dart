@@ -1,4 +1,4 @@
-enum PaymentMethod { creditCard, applePay, localBank }
+enum PaymentMethod { creditCard, localBank, qrPayment, cashOnDelivery }
 
 enum LocalBank { aceleda, aba }
 

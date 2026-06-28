@@ -11,6 +11,7 @@ class ProductCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
+      behavior: HitTestBehavior.opaque,
       onTap: () => Navigator.pushNamed(
         context,
         AppRouter.product,
@@ -58,9 +59,17 @@ class ProductCard extends StatelessWidget {
                 Positioned(
                   top: 8,
                   right: 8,
-                  child: _CircleIcon(
-                    icon: Icons.favorite_border_rounded,
-                    onTap: () {},
+                  child: ValueListenableBuilder<Set<String>>(
+                    valueListenable: favoriteIdsNotifier,
+                    builder: (context, favorites, _) {
+                      final isFavorite = favorites.contains(phone.id);
+                      return _CircleIcon(
+                        icon: isFavorite
+                            ? Icons.favorite_rounded
+                            : Icons.favorite_border_rounded,
+                        onTap: () => toggleFavorite(phone),
+                      );
+                    },
                   ),
                 ),
               ],

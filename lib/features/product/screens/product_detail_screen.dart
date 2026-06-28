@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../core/widgets/custom_bottom_nav.dart';
 import '../../../data/models/phone_model.dart';
+import '../../../core/router/app_router.dart';
 import '../widgets/color_selector.dart';
 import '../widgets/storage_selector.dart';
 import '../widgets/specification_tile.dart';
@@ -15,7 +16,6 @@ class ProductDetailScreen extends StatefulWidget {
 class _ProductDetailScreenState extends State<ProductDetailScreen> {
   int _selectedColor = 0;
   int _selectedStorage = 0;
-  bool _isFavorite = false;
 
   static const _bg = Color(0xFF020617);
   static const _surface = Color(0xFF0F172A);
@@ -28,7 +28,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         ModalRoute.of(context)!.settings.arguments as PhoneModel;
 
     return Scaffold(
-      backgroundColor: _bg,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       bottomNavigationBar: CustomBottomNav(selectedIndex: 0),
       body: Column(
         children: [
@@ -103,15 +103,19 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                           child: SafeArea(
                             child: Column(
                               children: [
-                                _RoundedActionButton(
-                                  icon: _isFavorite
-                                      ? Icons.favorite_rounded
-                                      : Icons.favorite_border_rounded,
-                                  iconColor: _isFavorite
-                                      ? Colors.red
-                                      : Colors.white,
-                                  onTap: () =>
-                                      setState(() => _isFavorite = !_isFavorite),
+                                ValueListenableBuilder<Set<String>>(
+                                  valueListenable: favoriteIdsNotifier,
+                                  builder: (context, favorites, _) {
+                                    final isFavorite = favorites.contains(phone.id);
+                                    return _RoundedActionButton(
+                                      icon: isFavorite
+                                          ? Icons.favorite_rounded
+                                          : Icons.favorite_border_rounded,
+                                      iconColor:
+                                          isFavorite ? Colors.red : Colors.white,
+                                      onTap: () => toggleFavorite(phone),
+                                    );
+                                  },
                                 ),
                                 const SizedBox(height: 8),
                                 _RoundedActionButton(
@@ -322,51 +326,89 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           ),
 
           // ── Fixed bottom CTA bar ──────────────────────────────
-          Container(
-            padding: EdgeInsets.fromLTRB(
-                20, 14, 20, MediaQuery.of(context).padding.bottom + 14),
-            decoration: BoxDecoration(
-          color: _surface,
-          border: Border(top: BorderSide(color: Color.fromRGBO(255, 255, 255, 0.07))),
-        ),
-            child: Row(
-              children: [
-                // Reserve in Store
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: () {},
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: Colors.white,
-                      side: BorderSide(color: Color.fromRGBO(255, 255, 255, 0.2)),
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14)),
+          ValueListenableBuilder<Set<String>>(
+            valueListenable: compareIdsNotifier,
+            builder: (context, compareIds, _) {
+              final isCompared = compareIds.contains(phone.id);
+              return ValueListenableBuilder<List<String>>(
+                valueListenable: cartIdsNotifier,
+                builder: (context, cartIds, _) {
+                  final inCart = cartIds.contains(phone.id);
+                  return Container(
+                    padding: EdgeInsets.fromLTRB(
+                        20, 14, 20, MediaQuery.of(context).padding.bottom + 14),
+                    decoration: BoxDecoration(
+                      color: _surface,
+                      border: Border(top: BorderSide(color: Color.fromRGBO(255, 255, 255, 0.07))),
                     ),
-                    child: const Text('Reserve in Store',
-                        style: TextStyle(
-                            fontWeight: FontWeight.w600, fontSize: 14)),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                // Buy Now
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () {},
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: _accent,
-                      foregroundColor: const Color(0xFF020617),
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14)),
-                      elevation: 0,
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: OutlinedButton(
+                            onPressed: () {
+                              toggleCompare(phone);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(isCompared
+                                      ? 'Removed from compare list'
+                                      : 'Added to compare list'),
+                                  duration: const Duration(milliseconds: 900),
+                                ),
+                              );
+                            },
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: Colors.white,
+                              side: BorderSide(color: Color.fromRGBO(255, 255, 255, 0.2)),
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(14)),
+                            ),
+                            child: Text(
+                              isCompared ? 'Compared' : 'Add to Compare',
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.w600, fontSize: 14),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: () {
+                              addToCart(phone);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(inCart
+                                      ? 'Added another item to cart'
+                                      : 'Added to cart'),
+                                  duration: const Duration(milliseconds: 900),
+                                  action: SnackBarAction(
+                                    label: 'View cart',
+                                    onPressed: () => Navigator.pushNamed(context, AppRouter.cart),
+                                  ),
+                                ),
+                              );
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: _accent,
+                              foregroundColor: const Color(0xFF020617),
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(14)),
+                              elevation: 0,
+                            ),
+                            child: Text(
+                              inCart ? 'Add Again' : 'Add to Cart',
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.w700, fontSize: 14),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                    child: const Text('Buy Now',
-                        style: TextStyle(
-                            fontWeight: FontWeight.w700, fontSize: 14)),
-                  ),
-                ),
-              ],
-            ),
+                  );
+                },
+              );
+            },
           ),
         ],
       ),

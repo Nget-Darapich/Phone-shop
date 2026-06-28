@@ -11,6 +11,7 @@ import 'package:phone_shop/features/more/screens/support_chat_screen.dart';
 import 'package:phone_shop/features/more/screens/store_locator_screen.dart';
 import 'package:phone_shop/features/more/screens/media_review_screen.dart';
 import 'package:phone_shop/features/cart/screens/cart_screen.dart';
+import 'package:phone_shop/features/compare/screens/compare_screen.dart';
 import 'package:phone_shop/features/product/screens/product_detail_screen.dart';
 
 class AppRouter {
@@ -29,6 +30,25 @@ class AppRouter {
   static const String mediaReview = '/media_review';
   static const String bookAppointment = '/book_appointment';
   static const String supportChat = '/support_chat';
+
+  /// All available route names in the app.
+  static final Set<String> availableRoutes = {
+    home,
+    product,
+    cart,
+    profile,
+    favorite,
+    compare,
+    more,
+    nearbyStock,
+    promotions,
+    repairTracker,
+    reviews,
+    storeLocator,
+    mediaReview,
+    bookAppointment,
+    supportChat,
+  };
 
   static Route<dynamic> onGenerateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -49,6 +69,9 @@ class AppRouter {
 
       case more:
         return MaterialPageRoute(builder: (_) => const MoreScreen());
+
+      case compare:
+        return MaterialPageRoute(builder: (_) => const CompareScreen());
 
       case nearbyStock:
         return MaterialPageRoute(builder: (_) => const NearbyStockScreen());

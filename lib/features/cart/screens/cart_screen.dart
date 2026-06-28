@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../core/widgets/custom_bottom_nav.dart';
+import '../../../data/models/phone_model.dart';
 
 class CartScreen extends StatelessWidget {
   const CartScreen({super.key});
@@ -11,7 +12,7 @@ class CartScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: _bg,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: _bg,
         elevation: 0,
@@ -41,151 +42,78 @@ class CartScreen extends StatelessWidget {
         ],
       ),
       bottomNavigationBar: const CustomBottomNav(selectedIndex: 3),
-      body: Column(
-        children: [
-          Expanded(
-            child: CustomScrollView(
-              slivers: [
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Cart Items
-                        _buildCartItem(
-                          productName: 'iPhone 15 Pro Max',
-                          brand: 'Apple',
-                          price: '\$1,199',
-                          quantity: 1,
-                          imageUrl: 'assets/icons/iphone.png',
-                        ),
-                        const SizedBox(height: 16),
-                        _buildCartItem(
-                          productName: 'Samsung Galaxy S24',
-                          brand: 'Samsung',
-                          price: '\$899',
-                          quantity: 2,
-                          imageUrl: 'assets/icons/samsung.png',
-                        ),
-                        const SizedBox(height: 16),
-                        _buildCartItem(
-                          productName: 'Google Pixel 8',
-                          brand: 'Google',
-                          price: '\$699',
-                          quantity: 1,
-                          imageUrl: 'assets/icons/pixel.png',
-                        ),
-                        const SizedBox(height: 100),
-                      ],
-                    ),
-                  ),
+      body: ValueListenableBuilder<List<String>>(
+        valueListenable: cartIdsNotifier,
+        builder: (context, cartIds, _) {
+          final quantityById = <String, int>{};
+          for (final id in cartIds) {
+            quantityById[id] = (quantityById[id] ?? 0) + 1;
+          }
+
+          if (quantityById.isEmpty) {
+            return const SafeArea(
+              child: Center(
+                child: Text(
+                  'Your cart is empty. Add a product to start shopping.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: Colors.white),
                 ),
-              ],
-            ),
-          ),
-          // Fixed bottom CTA bar
-          Container(
-            padding: EdgeInsets.fromLTRB(
-                20, 14, 20, MediaQuery.of(context).padding.bottom + 14),
-            decoration: BoxDecoration(
-              color: _surface,
-              border: Border(top: BorderSide(color: Color.fromRGBO(255, 255, 255, 0.07))),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      'Subtotal',
-                      style: TextStyle(
-                          color: Color.fromRGBO(255, 255, 255, 0.5),
-                          fontSize: 14),
-                    ),
-                    Text(
-                      '\$2,797',
-                      style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700),
+              ),
+            );
+          }
+
+          final cartItems = quantityById.entries
+              .map((entry) {
+                final phone = samplePhones.firstWhere(
+                  (phone) => phone.id == entry.key,
+                  orElse: () => samplePhones.first,
+                );
+                return MapEntry(phone, entry.value);
+              })
+              .toList();
+
+          final subtotal = cartItems.fold<double>(
+            0,
+            (sum, entry) => sum + entry.key.price * entry.value,
+          );
+
+          return Column(
+            children: [
+              Expanded(
+                child: CustomScrollView(
+                  slivers: [
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            for (final entry in cartItems) ...[
+                              _buildCartItem(
+                                phone: entry.key,
+                                quantity: entry.value,
+                              ),
+                              const SizedBox(height: 16),
+                            ],
+                            const SizedBox(height: 100),
+                          ],
+                        ),
+                      ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 8),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      'Shipping',
-                      style: TextStyle(
-                          color: Color.fromRGBO(255, 255, 255, 0.5),
-                          fontSize: 14),
-                    ),
-                    Text(
-                      'Free',
-                      style: const TextStyle(
-                          color: _accent,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                const Divider(color: Colors.white12),
-                const SizedBox(height: 12),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      'Total',
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w800),
-                    ),
-                    Text(
-                      '\$2,797',
-                      style: const TextStyle(
-                          color: _accent,
-                          fontSize: 24,
-                          fontWeight: FontWeight.w900),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                SizedBox(
-                  width: double.infinity,
-                  height: 56,
-                  child: ElevatedButton(
-                    onPressed: () {},
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: _accent,
-                      foregroundColor: const Color(0xFF020617),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14)),
-                      elevation: 0,
-                    ),
-                    child: const Text('Checkout',
-                        style: TextStyle(
-                            fontWeight: FontWeight.w700, fontSize: 16)),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
+              ),
+              _buildCartFooter(context, subtotal),
+            ],
+          );
+        },
       ),
     );
   }
 
   Widget _buildCartItem({
-    required String productName,
-    required String brand,
-    required String price,
+    required PhoneModel phone,
     required int quantity,
-    required String imageUrl,
   }) {
     return Container(
       padding: const EdgeInsets.all(16),
@@ -204,7 +132,7 @@ class CartScreen extends StatelessWidget {
               borderRadius: BorderRadius.circular(12),
             ),
             child: Image.asset(
-              imageUrl,
+              phone.image,
               errorBuilder: (context, error, stackTrace) {
                 return const Icon(Icons.phone_android,
                     size: 40, color: Color(0xFF334155));
@@ -217,7 +145,7 @@ class CartScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  brand,
+                  phone.brand,
                   style: const TextStyle(
                       color: _accent,
                       fontSize: 12,
@@ -226,7 +154,7 @@ class CartScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  productName,
+                  phone.name,
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 16,
@@ -235,7 +163,7 @@ class CartScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  price,
+                  '\$${(phone.price * quantity).toStringAsFixed(0)}',
                   style: const TextStyle(
                     color: _accent,
                     fontSize: 18,
@@ -258,7 +186,9 @@ class CartScreen extends StatelessWidget {
                     IconButton(
                       icon: const Icon(Icons.remove_rounded,
                           color: Colors.white, size: 18),
-                      onPressed: () {},
+                      onPressed: () {
+                        removeFromCart(phone);
+                      },
                       padding: const EdgeInsets.all(4),
                     ),
                     Container(
@@ -274,13 +204,108 @@ class CartScreen extends StatelessWidget {
                     IconButton(
                       icon: const Icon(Icons.add_rounded,
                           color: Colors.white, size: 18),
-                      onPressed: () {},
+                      onPressed: () {
+                        addToCart(phone);
+                      },
                       padding: const EdgeInsets.all(4),
                     ),
                   ],
                 ),
               ),
             ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCartFooter(BuildContext context, double subtotal) {
+    return Container(
+      padding: EdgeInsets.fromLTRB(
+          20, 14, 20, MediaQuery.of(context).padding.bottom + 14),
+      decoration: BoxDecoration(
+        color: _surface,
+        border: Border(top: BorderSide(color: Color.fromRGBO(255, 255, 255, 0.07))),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                'Subtotal',
+                style: TextStyle(
+                    color: Color.fromRGBO(255, 255, 255, 0.5),
+                    fontSize: 14),
+              ),
+              Text(
+                '\$${subtotal.toStringAsFixed(0)}',
+                style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                'Shipping',
+                style: TextStyle(
+                    color: Color.fromRGBO(255, 255, 255, 0.5),
+                    fontSize: 14),
+              ),
+              Text(
+                'Free',
+                style: const TextStyle(
+                    color: _accent,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          const Divider(color: Colors.white12),
+          const SizedBox(height: 12),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                'Total',
+                style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w800),
+              ),
+              Text(
+                '\$${subtotal.toStringAsFixed(0)}',
+                style: const TextStyle(
+                    color: _accent,
+                    fontSize: 24,
+                    fontWeight: FontWeight.w900),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          SizedBox(
+            width: double.infinity,
+            height: 56,
+            child: ElevatedButton(
+              onPressed: () {},
+              style: ElevatedButton.styleFrom(
+                backgroundColor: _accent,
+                foregroundColor: const Color(0xFF020617),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14)),
+                elevation: 0,
+              ),
+              child: const Text('Checkout',
+                  style: TextStyle(
+                      fontWeight: FontWeight.w700, fontSize: 16)),
+            ),
           ),
         ],
       ),

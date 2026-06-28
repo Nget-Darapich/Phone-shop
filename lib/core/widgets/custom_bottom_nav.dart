@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:phone_shop/data/models/phone_model.dart';
 import '../router/app_router.dart';
 
 class CustomBottomNav extends StatelessWidget {
@@ -78,20 +79,45 @@ class CustomBottomNav extends StatelessWidget {
             ),
           ),
 
-          // Cart
-          IconButton(
-            onPressed: () {
-              Navigator.pushNamed(context, AppRouter.cart);
-            },
-
-            icon: SvgPicture.asset(
-              "assets/icons/cart_icon.svg",
-              width: 20,
-              height: 20,
-              colorFilter: ColorFilter.mode(
-                selectedIndex == 3 ? Colors.cyan : Colors.grey,
-                BlendMode.srcIn,
-              ),
+          // Cart (with badge)
+          GestureDetector(
+            onTap: () => Navigator.pushNamed(context, AppRouter.cart),
+            child: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                SvgPicture.asset(
+                  "assets/icons/cart_icon.svg",
+                  width: 20,
+                  height: 20,
+                  colorFilter: ColorFilter.mode(
+                    selectedIndex == 3 ? Colors.cyan : Colors.grey,
+                    BlendMode.srcIn,
+                  ),
+                ),
+                Positioned(
+                  right: -8,
+                  top: -8,
+                  child: ValueListenableBuilder<List<String>>(
+                    valueListenable: cartIdsNotifier,
+                    builder: (context, cartIds, _) {
+                      final count = cartIds.length;
+                      if (count == 0) return const SizedBox.shrink();
+                      final display = count > 99 ? '99+' : count.toString();
+                      return Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: Colors.red,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          display,
+                          style: const TextStyle(color: Colors.white, fontSize: 10),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
             ),
           ),
 

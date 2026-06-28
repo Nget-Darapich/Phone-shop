@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+
 class PhoneModel {
   final String id;
   final String name;
@@ -110,3 +112,73 @@ final List<PhoneModel> samplePhones = [
     monthlyDuration: 24,
   ),
 ];
+
+final ValueNotifier<Set<String>> favoriteIdsNotifier = ValueNotifier(<String>{});
+
+bool isPhoneFavorite(PhoneModel phone) {
+  return favoriteIdsNotifier.value.contains(phone.id);
+}
+
+void toggleFavorite(PhoneModel phone) {
+  final updatedIds = Set<String>.from(favoriteIdsNotifier.value);
+  if (!updatedIds.remove(phone.id)) {
+    updatedIds.add(phone.id);
+  }
+  favoriteIdsNotifier.value = updatedIds;
+}
+
+List<PhoneModel> favoritePhones() {
+  return samplePhones
+      .where((phone) => favoriteIdsNotifier.value.contains(phone.id))
+      .toList();
+}
+
+/// Cart state stores selected phone IDs so the cart can be rendered dynamically.
+final ValueNotifier<List<String>> cartIdsNotifier = ValueNotifier(<String>[]);
+
+/// Compare state stores selected phone IDs for product comparison.
+final ValueNotifier<Set<String>> compareIdsNotifier = ValueNotifier(<String>{});
+
+bool isPhoneInCart(PhoneModel phone) {
+  return cartIdsNotifier.value.contains(phone.id);
+}
+
+int cartQuantity(PhoneModel phone) {
+  return cartIdsNotifier.value.where((id) => id == phone.id).length;
+}
+
+void addToCart(PhoneModel phone) {
+  final updated = List<String>.from(cartIdsNotifier.value);
+  updated.add(phone.id);
+  cartIdsNotifier.value = updated;
+}
+
+void removeFromCart(PhoneModel phone) {
+  final updated = List<String>.from(cartIdsNotifier.value);
+  updated.remove(phone.id);
+  cartIdsNotifier.value = updated;
+}
+
+List<PhoneModel> cartPhones() {
+  final ids = cartIdsNotifier.value;
+  final uniqueIds = ids.toSet().toList();
+  return samplePhones.where((phone) => uniqueIds.contains(phone.id)).toList();
+}
+
+bool isPhoneCompared(PhoneModel phone) {
+  return compareIdsNotifier.value.contains(phone.id);
+}
+
+void toggleCompare(PhoneModel phone) {
+  final updated = Set<String>.from(compareIdsNotifier.value);
+  if (!updated.remove(phone.id)) {
+    updated.add(phone.id);
+  }
+  compareIdsNotifier.value = updated;
+}
+
+List<PhoneModel> comparePhones() {
+  return samplePhones
+      .where((phone) => compareIdsNotifier.value.contains(phone.id))
+      .toList();
+}

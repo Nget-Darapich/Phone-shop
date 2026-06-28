@@ -31,7 +31,7 @@ class CustomBottomNav extends StatelessWidget {
           // Home
           IconButton(
             onPressed: () {
-              Navigator.pushNamed(context, AppRouter.home);
+              Navigator.pushNamedAndRemoveUntil(context, AppRouter.home, (route) => false);
             },
 
             icon: SvgPicture.asset(
@@ -48,7 +48,7 @@ class CustomBottomNav extends StatelessWidget {
           // Compare
           IconButton(
             onPressed: () {
-              Navigator.pushNamed(context, AppRouter.compare);
+              Navigator.pushNamedAndRemoveUntil(context, AppRouter.compare, (route) => false);
             },
 
             icon: SvgPicture.asset(
@@ -65,7 +65,7 @@ class CustomBottomNav extends StatelessWidget {
           // Favorite
           IconButton(
             onPressed: () {
-              Navigator.pushNamed(context, AppRouter.favorite);
+              Navigator.pushNamedAndRemoveUntil(context, AppRouter.favorite, (route) => false);
             },
 
             icon: SvgPicture.asset(
@@ -81,7 +81,7 @@ class CustomBottomNav extends StatelessWidget {
 
           // Cart (with badge)
           GestureDetector(
-            onTap: () => Navigator.pushNamed(context, AppRouter.cart),
+            onTap: () => Navigator.pushNamedAndRemoveUntil(context, AppRouter.cart, (route) => false),
             child: Stack(
               clipBehavior: Clip.none,
               children: [
@@ -124,7 +124,7 @@ class CustomBottomNav extends StatelessWidget {
           // Profile/More
           IconButton(
             onPressed: () {
-              Navigator.pushNamed(context, AppRouter.more);
+              Navigator.pushNamedAndRemoveUntil(context, AppRouter.more, (route) => false);
             },
 
             icon: SvgPicture.asset(

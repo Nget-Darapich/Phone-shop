@@ -19,7 +19,7 @@ import 'package:phone_shop/features/product/screens/product_detail_screen.dart';
 import 'package:phone_shop/features/checkout/screens/checkout_screen.dart';
 class AppRouter {
   static const String home = '/';
-  static const String product = '/product';
+  static String product(String id) => '/product/$id';
   static const String checkout = '/checkout';
   static const String cart = '/cart';
   static const String profile = '/profile';
@@ -42,7 +42,6 @@ class AppRouter {
   /// All available route names in the app.
   static final Set<String> availableRoutes = {
     home,
-    product,
     productList,
     cart,
     profile,
@@ -63,26 +62,27 @@ class AppRouter {
   };
 
   static Route<dynamic> onGenerateRoute(RouteSettings settings) {
-    switch (settings.name) {
-      case home:
-        return MaterialPageRoute(builder: (_) => const HomeScreen());
-
-      case product:
-        final args = settings.arguments;
-        if (args is ProductModel) {
-          return MaterialPageRoute(
-            builder: (_) => ProductDetailScreen(product: args),
-            settings: settings,
-          );
-        }
+    if (settings.name != null && settings.name!.startsWith('/product/')) {
+      final id = settings.name!.substring('/product/'.length);
+      try {
+        final product = sampleProducts.firstWhere((p) => p.id == id);
+        return MaterialPageRoute(
+          builder: (_) => ProductDetailScreen(product: product),
+          settings: settings,
+        );
+      } catch (_) {
         return MaterialPageRoute(
           builder: (_) => const Scaffold(
-            body: Center(
-              child: Text('No product selected.'),
-            ),
+            body: Center(child: Text('Product not found.')),
           ),
         );
-      
+      }
+    }
+
+    switch (settings.name) {
+      case home:
+        return MaterialPageRoute(builder: (_) => const HomeScreen(), settings: settings);
+
       case checkout:
         return MaterialPageRoute(
           builder: (_) => const CheckoutScreen(),
@@ -90,57 +90,57 @@ class AppRouter {
         );
 
       case favorite:
-        return MaterialPageRoute(builder: (_) => const FavoriteScreen());
+        return MaterialPageRoute(builder: (_) => const FavoriteScreen(), settings: settings);
 
       case cart:
-        return MaterialPageRoute(builder: (_) => const CartScreen());
+        return MaterialPageRoute(builder: (_) => const CartScreen(), settings: settings);
 
       case more:
-        return MaterialPageRoute(builder: (_) => const MoreScreen());
+        return MaterialPageRoute(builder: (_) => const MoreScreen(), settings: settings);
 
       case compare:
-        return MaterialPageRoute(builder: (_) => const CompareScreen());
+        return MaterialPageRoute(builder: (_) => const CompareScreen(), settings: settings);
 
       case auth:
         final page = settings.arguments is int ? settings.arguments as int : 0;
-        return MaterialPageRoute(builder: (_) => AuthScreen(initialPage: page));
+        return MaterialPageRoute(builder: (_) => AuthScreen(initialPage: page), settings: settings);
 
       case login:
-        return MaterialPageRoute(builder: (_) => const AuthScreen(initialPage: 0));
+        return MaterialPageRoute(builder: (_) => const AuthScreen(initialPage: 0), settings: settings);
 
       case register:
-        return MaterialPageRoute(builder: (_) => const AuthScreen(initialPage: 1));
+        return MaterialPageRoute(builder: (_) => const AuthScreen(initialPage: 1), settings: settings);
 
       case nearbyStock:
-        return MaterialPageRoute(builder: (_) => const NearbyStockScreen());
+        return MaterialPageRoute(builder: (_) => const NearbyStockScreen(), settings: settings);
 
       case promotions:
-        return MaterialPageRoute(builder: (_) => promos.PromotionsScreen());
+        return MaterialPageRoute(builder: (_) => promos.PromotionsScreen(), settings: settings);
 
       case repairTracker:
-        return MaterialPageRoute(builder: (_) => const RepairTrackerScreen());
+        return MaterialPageRoute(builder: (_) => const RepairTrackerScreen(), settings: settings);
 
       case reviews:
-        return MaterialPageRoute(builder: (_) => const ReviewsScreen());
+        return MaterialPageRoute(builder: (_) => const ReviewsScreen(), settings: settings);
 
       case storeLocator:
-        return MaterialPageRoute(builder: (_) => const StoreLocatorScreen());
+        return MaterialPageRoute(builder: (_) => const StoreLocatorScreen(), settings: settings);
 
       case mediaReview:
-        return MaterialPageRoute(builder: (_) => const MediaReviewScreen());
+        return MaterialPageRoute(builder: (_) => const MediaReviewScreen(), settings: settings);
 
       case bookAppointment:
-        return MaterialPageRoute(builder: (_) => const BookAppointmentScreen());
+        return MaterialPageRoute(builder: (_) => const BookAppointmentScreen(), settings: settings);
 
       case supportChat:
-        return MaterialPageRoute(builder: (_) => const SupportChatScreen());
+        return MaterialPageRoute(builder: (_) => const SupportChatScreen(), settings: settings);
+
       case productList:
         final filter = settings.arguments as ProductListFilter;
         return MaterialPageRoute(
           builder: (_) => ProductListScreen(filter: filter),
+          settings: settings,
         );
-      // case compare:
-      //   return MaterialPageRoute(builder: (_) => const CompareScreen());
 
       default:
         return MaterialPageRoute(

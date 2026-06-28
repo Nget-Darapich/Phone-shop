@@ -26,12 +26,12 @@ class CartScreen extends StatelessWidget {
           }
 
           if (quantityById.isEmpty) {
-            return const SafeArea(
+            return SafeArea(
               child: Center(
                 child: Text(
                   'Your cart is empty. Add a product to start shopping.',
                   textAlign: TextAlign.center,
-                  style: TextStyle(color: Colors.white),
+                  style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
                 ),
               ),
             );

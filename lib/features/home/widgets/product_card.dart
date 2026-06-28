@@ -13,8 +13,7 @@ class ProductCard extends StatelessWidget {
       behavior: HitTestBehavior.opaque,
       onTap: () => Navigator.pushNamed(
         context,
-        AppRouter.product,
-        arguments: product,
+        AppRouter.product(product.id),
       ),
       child: Container(
         width: 180,

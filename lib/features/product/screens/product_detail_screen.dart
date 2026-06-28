@@ -45,7 +45,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   backgroundColor: card,
                   pinned: true,
                   leading: GestureDetector(
-                    onTap: () => Navigator.pop(context),
+                    onTap: () => Navigator.pushNamedAndRemoveUntil(context, AppRouter.home, (route) => false),
                     child: Container(
                       margin: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
@@ -147,6 +147,14 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         Text(
                           product.name,
                           style: textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w800),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          'ID: ${product.id}',
+                          style: TextStyle(
+                            color: onSurface.withValues(alpha: 0.45),
+                            fontSize: 12,
+                          ),
                         ),
                         const SizedBox(height: 6),
 

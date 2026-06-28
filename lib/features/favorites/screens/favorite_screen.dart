@@ -22,12 +22,15 @@ class FavoriteScreen extends StatelessWidget {
 
           if (items.isEmpty) {
             return Center(
-              child: Text(
-                'No favorites yet. Tap the heart icon on a product to save it.',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.7) ?? Colors.black54,
-                  fontSize: 16,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Text(
+                  'No favorites yet. Tap the heart icon on a product to save it.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                    fontSize: 16,
+                  ),
                 ),
               ),
             );
@@ -43,8 +46,7 @@ class FavoriteScreen extends StatelessWidget {
                 borderRadius: BorderRadius.circular(18),
                 onTap: () => Navigator.pushNamed(
                   context,
-                  AppRouter.product,
-                  arguments: phone,
+                  AppRouter.product(phone.id),
                 ),
                 child: Container(
                   decoration: BoxDecoration(

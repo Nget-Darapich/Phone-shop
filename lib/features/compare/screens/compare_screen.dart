@@ -24,9 +24,9 @@ class CompareScreen extends StatelessWidget {
         builder: (context, compareIds, _) {
           final items = compareProducts();
           if (items.isEmpty) {
-            return const SafeArea(
+            return SafeArea(
               child: Center(
-                child: Text('No items to compare yet', style: TextStyle(color: Colors.white)),
+                child: Text('No items to compare yet', style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
               ),
             );
           }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:phone_shop/core/router/app_router.dart';
 import 'package:phone_shop/data/models/product_model.dart';
 
 class ProductListScreen extends StatelessWidget {
@@ -68,7 +69,7 @@ class _ProductGridCard extends StatelessWidget {
     final onSurface = theme.colorScheme.onSurface;
     final primary = theme.colorScheme.primary;
     return GestureDetector(
-      onTap: () => Navigator.pushNamed(context, '/product', arguments: product),
+      onTap: () => Navigator.pushNamed(context, AppRouter.product(product.id)),
       child: Container(
         decoration: BoxDecoration(
           color: theme.cardColor,

@@ -80,8 +80,8 @@ class BrandCircle extends StatelessWidget {
               brand,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                color: Colors.white,
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurface,
                 fontSize: 14,
                 fontWeight: FontWeight.w700,
               ),
@@ -90,7 +90,7 @@ class BrandCircle extends StatelessWidget {
             Text(
               'Trusted choice',
               style: TextStyle(
-                color: Colors.white.withValues(alpha: 0.75),
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                 fontSize: 11,
                 fontWeight: FontWeight.w500,
               ),

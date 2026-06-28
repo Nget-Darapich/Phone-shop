@@ -35,9 +35,12 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
+    final theme = Theme.of(context);
+    final textTheme = theme.textTheme;
+    final surface = theme.cardColor;
+    final onSurface = theme.colorScheme.onSurface;
     return Scaffold(
-      backgroundColor: const Color(0xFF020617),
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: CustomAppBar(),
       bottomNavigationBar: const CustomBottomNav(selectedIndex: 0),
       body: SafeArea(
@@ -57,13 +60,9 @@ class HomeScreen extends StatelessWidget {
                 width: double.infinity,
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFF0B1423), Color(0xFF111C33)],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
+                  color: surface,
                   borderRadius: BorderRadius.circular(28),
-                  border: Border.all(color: Colors.white12),
+                  border: Border.all(color: theme.dividerColor),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -71,23 +70,19 @@ class HomeScreen extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text(
+                        Text(
                           'Top Brands',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 18,
-                            fontWeight: FontWeight.w700,
-                          ),
+                          style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
                         ),
                         TextButton(
                           onPressed: () {},
                           style: TextButton.styleFrom(
-                            foregroundColor: Colors.white70,
+                            foregroundColor: onSurface.withValues(alpha: 0.7),
                             padding: EdgeInsets.zero,
                             minimumSize: const Size(40, 24),
                             tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                           ),
-                          child: const Text('See all'),
+                          child: Text('See all', style: textTheme.bodySmall),
                         ),
                       ],
                     ),
@@ -121,13 +116,9 @@ class HomeScreen extends StatelessWidget {
                 width: double.infinity,
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFF0C172A), Color(0xFF08101F)],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
+                  color: surface,
                   borderRadius: BorderRadius.circular(28),
-                  border: Border.all(color: Colors.white12),
+                  border: Border.all(color: theme.dividerColor),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -135,23 +126,19 @@ class HomeScreen extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text(
+                        Text(
                           'Categories',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 18,
-                            fontWeight: FontWeight.w700,
-                          ),
+                          style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
                         ),
                         TextButton(
                           onPressed: () {},
                           style: TextButton.styleFrom(
-                            foregroundColor: Colors.white70,
+                            foregroundColor: onSurface.withValues(alpha: 0.7),
                             padding: EdgeInsets.zero,
                             minimumSize: const Size(40, 24),
                             tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                           ),
-                          child: const Text('Browse all'),
+                          child: Text('See all', style: textTheme.bodySmall),
                         ),
                       ],
                     ),
@@ -229,17 +216,14 @@ class HomeScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 24),
-              _buildSectionTitle(context, 'Flash sale', 'View all'),
+              _buildSectionTitle(context, 'Flash sale', 'See all'),
               const SizedBox(height: 14),
               Container(
                 width: double.infinity,
                 decoration: BoxDecoration(
+                  color: surface,
                   borderRadius: BorderRadius.circular(24),
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFF0F172A), Color(0xFF1E293B)],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
+                  border: Border.all(color: theme.dividerColor),
                 ),
                 padding: const EdgeInsets.all(20),
                 child: Column(
@@ -247,19 +231,19 @@ class HomeScreen extends StatelessWidget {
                   children: [
                     Text(
                       'Special offer',
-                      style: textTheme.titleLarge?.copyWith(color: Colors.white, fontWeight: FontWeight.w700),
+                      style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
                     ),
                     const SizedBox(height: 8),
                     Text(
                       'Up to 30% off selected flagship phones. Limited time only.',
-                      style: textTheme.bodyMedium?.copyWith(color: Colors.white70),
+                      style: textTheme.bodyMedium?.copyWith(color: onSurface.withValues(alpha: 0.7)),
                     ),
                     const SizedBox(height: 18),
                     Row(
                       children: [
-                        _buildPromoBadge('Hot Deal'),
+                        _buildPromoBadge(context, 'Hot Deal'),
                         const SizedBox(width: 10),
-                        _buildPromoBadge('Free Delivery'),
+                        _buildPromoBadge(context, 'Free Delivery'),
                       ],
                     ),
                     const SizedBox(height: 22),
@@ -288,12 +272,12 @@ class HomeScreen extends StatelessWidget {
                               children: [
                                 Text(
                                   sampleProducts.first.name,
-                                  style: textTheme.headlineSmall?.copyWith(color: Colors.white, fontWeight: FontWeight.w800),
+                                  style: textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w800),
                                 ),
                                 const SizedBox(height: 8),
                                 Text(
                                   '\$${sampleProducts.first.price.toStringAsFixed(0)}',
-                                  style: textTheme.titleLarge?.copyWith(color: Colors.white, fontWeight: FontWeight.bold),
+                                  style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
                                 ),
                               ],
                             ),
@@ -343,16 +327,17 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildPromoBadge(String label) {
+  Widget _buildPromoBadge(BuildContext context, String label) {
+    final theme = Theme.of(context);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
       decoration: BoxDecoration(
-        color: Colors.white24,
+        color: theme.colorScheme.surface.withValues(alpha: 0.6),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Text(
         label,
-        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+        style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
       ),
     );
   }

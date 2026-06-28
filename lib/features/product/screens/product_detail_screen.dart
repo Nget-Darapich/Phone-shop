@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import '../../../core/router/app_router.dart';
 import '../../../core/widgets/custom_bottom_nav.dart';
 import '../../../data/models/phone_model.dart';
-import '../../../core/router/app_router.dart';
 import '../widgets/color_selector.dart';
 import '../widgets/storage_selector.dart';
 import '../widgets/specification_tile.dart';

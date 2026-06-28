@@ -1,13 +1,29 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 
 import '../../../core/widgets/custom_appbar.dart';
 import '../../../core/widgets/custom_bottom_nav.dart';
 import '../../../data/models/phone_model.dart';
+import '../widgets/brand_card.dart';
+import '../widgets/category_card.dart';
 import '../widgets/hero_banner.dart';
 import '../widgets/product_card.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
+
+  static final List<_BrandItem> brandItems = [
+    _BrandItem(name: 'Apple', color: Color(0xFF3B82F6)),
+    _BrandItem(name: 'Samsung', color: Color(0xFF0EA5E9)),
+    _BrandItem(name: 'Xiaomi', color: Color(0xFFFB923C)),
+    _BrandItem(name: 'Oppo', color: Color(0xFF22C55E)),
+  ];
+
+  static final List<_CategoryItem> categoryItems = [
+    _CategoryItem(icon: Icons.phone_android, title: 'Phones', color: Color(0xFF38BDF8)),
+    _CategoryItem(icon: Icons.tablet_android, title: 'Tablets', color: Color(0xFF818CF8)),
+    _CategoryItem(icon: Icons.watch, title: 'Wearables', color: Color(0xFFA855F7)),
+    _CategoryItem(icon: Icons.headphones, title: 'Accessories', color: Color(0xFF22C55E)),
+  ];
 
   static final List<_CategoryData> _categories = [
     _CategoryData(label: 'Deals', icon: Icons.local_offer_rounded, color: Color(0xFF38BDF8)),
@@ -21,21 +37,104 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      backgroundColor: const Color(0xFF020617),
       appBar: CustomAppBar(),
       bottomNavigationBar: const CustomBottomNav(selectedIndex: 0),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+          padding: const EdgeInsets.all(20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               HeroBanner(
-                imagePath: 'assets/images/hero_banner.jpg',
-                title: 'Shop the latest smartphone deals',
-                subtitle: 'Save on premium phones, trade in your old device, and enjoy fast delivery.',
+                imagePath: 'assets/images/hero_banner.png',
+                title: 'Latest Phones',
+                subtitle: 'Titanium. So strong. So light.',
+              ),
+              const SizedBox(height: 30),
+
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(18),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF0C172A),
+                  borderRadius: BorderRadius.circular(24),
+                  border: Border.all(color: Colors.white12),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Top Brands',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    const SizedBox(height: 18),
+                    SizedBox(
+                      height: 128,
+                      child: ListView.separated(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: brandItems.length,
+                        separatorBuilder: (_, __) => const SizedBox(width: 18),
+                        itemBuilder: (context, index) {
+                          final item = brandItems[index];
+                          return BrandCircle(
+                            brand: item.name,
+                            backgroundColor: item.color,
+                            onTap: () {},
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
               ),
               const SizedBox(height: 24),
+
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(18),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF0C172A),
+                  borderRadius: BorderRadius.circular(24),
+                  border: Border.all(color: Colors.white12),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Categories',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    const SizedBox(height: 18),
+                    SizedBox(
+                      height: 122,
+                      child: ListView.separated(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: categoryItems.length,
+                        separatorBuilder: (_, __) => const SizedBox(width: 16),
+                        itemBuilder: (context, index) {
+                          final item = categoryItems[index];
+                          return CategoryCard(
+                            icon: item.icon,
+                            title: item.title,
+                            accentColor: item.color,
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 40),
+
               _buildSectionTitle(context, 'Shop by category', 'See all'),
               const SizedBox(height: 14),
               SizedBox(
@@ -170,6 +269,7 @@ class HomeScreen extends StatelessWidget {
                   itemBuilder: (context, i) => ProductCard(phone: samplePhones[i]),
                 ),
               ),
+              const SizedBox(height: 30),
             ],
           ),
         ),
@@ -209,6 +309,21 @@ class HomeScreen extends StatelessWidget {
       ),
     );
   }
+}
+
+class _BrandItem {
+  final String name;
+  final Color color;
+
+  const _BrandItem({required this.name, required this.color});
+}
+
+class _CategoryItem {
+  final IconData icon;
+  final String title;
+  final Color color;
+
+  const _CategoryItem({required this.icon, required this.title, required this.color});
 }
 
 class _CategoryData {

@@ -7,7 +7,9 @@ import '../widgets/storage_selector.dart';
 import '../widgets/specification_tile.dart';
 
 class ProductDetailScreen extends StatefulWidget {
-  const ProductDetailScreen({super.key});
+  final PhoneModel phone;
+
+  const ProductDetailScreen({super.key, required this.phone});
 
   @override
   State<ProductDetailScreen> createState() => _ProductDetailScreenState();
@@ -23,12 +25,11 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Receive PhoneModel passed via Navigator arguments
-    final phone =
-        ModalRoute.of(context)!.settings.arguments as PhoneModel;
+    final phone = widget.phone;
+    final theme = Theme.of(context);
 
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      backgroundColor: theme.scaffoldBackgroundColor,
       bottomNavigationBar: CustomBottomNav(selectedIndex: 0),
       body: Column(
         children: [
@@ -177,12 +178,40 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                             Text(
                               '${phone.reviewCount} reviews',
                               style: TextStyle(
-                                  color: Color.fromRGBO(255, 255, 255, 0.45),
+                                  color: theme.colorScheme.onBackground.withOpacity(0.55),
                                   fontSize: 13),
                             ),
                           ],
                         ),
 
+                        const SizedBox(height: 12),
+                        Text(
+                          phone.description,
+                          style: TextStyle(
+                            color: theme.colorScheme.onBackground.withOpacity(0.72),
+                            fontSize: 14,
+                            height: 1.6,
+                          ),
+                        ),
+                        const SizedBox(height: 18),
+                        Wrap(
+                          spacing: 10,
+                          runSpacing: 10,
+                          children: [
+                            _InfoChip(
+                              icon: Icons.palette_outlined,
+                              label: '${phone.colors.length} colors',
+                            ),
+                            _InfoChip(
+                              icon: Icons.sd_storage,
+                              label: phone.storage.first,
+                            ),
+                            _InfoChip(
+                              icon: Icons.bolt_outlined,
+                              label: 'Fast charge',
+                            ),
+                          ],
+                        ),
                         const SizedBox(height: 20),
 
                         // ── Price block ────────────────────────
@@ -212,22 +241,28 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                               ),
                               const SizedBox(height: 10),
                               Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(
-                                    '\$${phone.price.toStringAsFixed(0)}',
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 26,
-                                      fontWeight: FontWeight.w900,
+                                  Expanded(
+                                    child: Text(
+                                      '\$${phone.price.toStringAsFixed(0)}',
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 26,
+                                        fontWeight: FontWeight.w900,
+                                      ),
                                     ),
                                   ),
-                                  Text(
-                                    'or \$${phone.monthlyPrice.toStringAsFixed(2)}/mo for ${phone.monthlyDuration} mos.',
-                                    style: TextStyle(
-                                      color: Color.fromRGBO(255, 255, 255, 0.5),
-                                      fontSize: 12,
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Text(
+                                      'or \$${phone.monthlyPrice.toStringAsFixed(2)}/mo for ${phone.monthlyDuration} mos.',
+                                      style: TextStyle(
+                                        color: theme.colorScheme.onBackground.withOpacity(0.65),
+                                        fontSize: 12,
+                                      ),
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
                                     ),
                                   ),
                                 ],
@@ -275,18 +310,18 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         const SizedBox(height: 24),
 
                         // ── Feature cards (warranty / delivery / return) ──
-                        Row(
-                          children: [
+                        Wrap(
+                          spacing: 10,
+                          runSpacing: 10,
+                          children: const [
                             _FeatureCard(
                               icon: Icons.verified_outlined,
                               label: '1 Year\nWarranty',
                             ),
-                            const SizedBox(width: 10),
                             _FeatureCard(
                               icon: Icons.local_shipping_outlined,
                               label: 'Free\nDelivery',
                             ),
-                            const SizedBox(width: 10),
                             _FeatureCard(
                               icon: Icons.replay_rounded,
                               label: '14 Days\nReturn',
@@ -464,6 +499,40 @@ class _RoundedActionButton extends StatelessWidget {
           shape: BoxShape.circle,
         ),
         child: Icon(icon, color: iconColor, size: 20),
+      ),
+    );
+  }
+}
+
+class _InfoChip extends StatelessWidget {
+  final IconData icon;
+  final String label;
+
+  const _InfoChip({required this.icon, required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: const Color(0xFF0F172A),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Color.fromRGBO(255, 255, 255, 0.08)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, color: const Color(0xFF38BDF8), size: 16),
+          const SizedBox(width: 8),
+          Text(
+            label,
+            style: const TextStyle(
+              color: Colors.white70,
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
       ),
     );
   }

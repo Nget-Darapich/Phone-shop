@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:phone_shop/data/models/phone_model.dart';
+import 'package:phone_shop/features/auth/screens/auth_screen.dart';
 import 'package:phone_shop/features/home/screens/home_screen.dart';
 import 'package:phone_shop/features/favorites/screens/favorite_screen.dart';
 import '../../features/more/screens/more_screen.dart';
@@ -21,6 +23,9 @@ class AppRouter {
   static const String profile = '/profile';
   static const String favorite = '/favorite';
   static const String compare = '/compare';
+  static const String auth = '/auth';
+  static const String login = '/login';
+  static const String register = '/register';
   static const String more = '/more';
   static const String nearbyStock = '/nearby_stock';
   static const String promotions = '/promotions';
@@ -39,6 +44,9 @@ class AppRouter {
     profile,
     favorite,
     compare,
+    auth,
+    login,
+    register,
     more,
     nearbyStock,
     promotions,
@@ -56,9 +64,19 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => const HomeScreen());
 
       case product:
+        final args = settings.arguments;
+        if (args is PhoneModel) {
+          return MaterialPageRoute(
+            builder: (_) => ProductDetailScreen(phone: args),
+            settings: settings,
+          );
+        }
         return MaterialPageRoute(
-          builder: (_) => const ProductDetailScreen(),
-          settings: settings, 
+          builder: (_) => const Scaffold(
+            body: Center(
+              child: Text('No product selected.'),
+            ),
+          ),
         );
         
       case favorite:
@@ -72,6 +90,16 @@ class AppRouter {
 
       case compare:
         return MaterialPageRoute(builder: (_) => const CompareScreen());
+
+      case auth:
+        final page = settings.arguments is int ? settings.arguments as int : 0;
+        return MaterialPageRoute(builder: (_) => AuthScreen(initialPage: page));
+
+      case login:
+        return MaterialPageRoute(builder: (_) => const AuthScreen(initialPage: 0));
+
+      case register:
+        return MaterialPageRoute(builder: (_) => const AuthScreen(initialPage: 1));
 
       case nearbyStock:
         return MaterialPageRoute(builder: (_) => const NearbyStockScreen());

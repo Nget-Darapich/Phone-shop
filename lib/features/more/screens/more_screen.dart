@@ -118,7 +118,8 @@ class MoreScreen extends StatelessWidget {
               ),
               const SizedBox(height: 20),
 
-              // Theme toggle
+              // Removed inline login/register buttons to use the profile icon entrypoint instead.
+
               ValueListenableBuilder(
                 valueListenable: themeNotifier,
                 builder: (context, ThemeMode mode, _) {

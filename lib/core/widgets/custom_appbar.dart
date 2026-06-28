@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../router/app_router.dart';
 import '../theme/theme_notifier.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
@@ -52,7 +53,13 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
         const SizedBox(width: 10),
         Padding(
           padding: const EdgeInsets.only(right: 15),
-          child: CircleAvatar(child: Icon(Icons.person, color: Theme.of(context).iconTheme.color)),
+          child: GestureDetector(
+            onTap: () => Navigator.pushNamed(context, AppRouter.auth),
+            child: CircleAvatar(
+              backgroundColor: Theme.of(context).colorScheme.primary,
+              child: Icon(Icons.person, color: Colors.white),
+            ),
+          ),
         ),
       ],
     );

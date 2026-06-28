@@ -5,8 +5,6 @@ import '../../../data/models/product_model.dart';
 class CartScreen extends StatelessWidget {
   const CartScreen({super.key});
 
-  static const _bg = Color(0xFF020617);
-  static const _surface = Color(0xFF0F172A);
   static const _accent = Color(0xFF38BDF8);
 
   @override
@@ -64,7 +62,7 @@ class CartScreen extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             for (final entry in cartItems) ...[
-                              _buildCartItem(
+                              _buildCartItem(context,
                                 phone: entry.key,
                                 quantity: entry.value,
                               ),
@@ -86,16 +84,19 @@ class CartScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildCartItem({
+  Widget _buildCartItem(BuildContext context, {
     required ProductModel phone,
     required int quantity,
   }) {
+    final theme = Theme.of(context);
+    final onSurface = theme.colorScheme.onSurface;
+    final primary = theme.colorScheme.primary;
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: _surface,
+        color: theme.cardColor,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: Color.fromRGBO(255, 255, 255, 0.07)),
+        border: Border.all(color: theme.dividerColor),
       ),
       child: Row(
         children: [
@@ -103,14 +104,14 @@ class CartScreen extends StatelessWidget {
             width: 80,
             height: 80,
             decoration: BoxDecoration(
-              color: Color.fromRGBO(0, 0, 0, 0.2),
+              color: onSurface.withValues(alpha: 0.08),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Image.asset(
               phone.image,
               errorBuilder: (context, error, stackTrace) {
-                return const Icon(Icons.phone_android,
-                    size: 40, color: Color(0xFF334155));
+                return Icon(Icons.phone_android,
+                    size: 40, color: onSurface.withValues(alpha: 0.3));
               },
             ),
           ),
@@ -121,8 +122,8 @@ class CartScreen extends StatelessWidget {
               children: [
                 Text(
                   phone.brand.name[0].toUpperCase() + phone.brand.name.substring(1),
-                  style: const TextStyle(
-                      color: _accent,
+                  style: TextStyle(
+                      color: primary,
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
                       letterSpacing: 0.3),
@@ -130,8 +131,8 @@ class CartScreen extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   phone.name,
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: onSurface,
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
                   ),
@@ -139,8 +140,8 @@ class CartScreen extends StatelessWidget {
                 const SizedBox(height: 8),
                 Text(
                   '\$${(phone.price * quantity).toStringAsFixed(0)}',
-                  style: const TextStyle(
-                    color: _accent,
+                  style: TextStyle(
+                    color: primary,
                     fontSize: 18,
                     fontWeight: FontWeight.w800,
                   ),
@@ -152,15 +153,15 @@ class CartScreen extends StatelessWidget {
             children: [
               Container(
                 decoration: BoxDecoration(
-                  color: _bg,
+                  color: theme.canvasColor,
                   borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: Color.fromRGBO(255, 255, 255, 0.1)),
+                  border: Border.all(color: theme.dividerColor),
                 ),
                 child: Row(
                   children: [
                     IconButton(
-                      icon: const Icon(Icons.remove_rounded,
-                          color: Colors.white, size: 18),
+                      icon: Icon(Icons.remove_rounded,
+                          color: onSurface, size: 18),
                       onPressed: () {
                         removeFromCart(phone);
                       },
@@ -170,15 +171,15 @@ class CartScreen extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(horizontal: 12),
                       child: Text(
                         quantity.toString(),
-                        style: const TextStyle(
-                            color: Colors.white,
+                        style: TextStyle(
+                            color: onSurface,
                             fontSize: 14,
                             fontWeight: FontWeight.w600),
                       ),
                     ),
                     IconButton(
-                      icon: const Icon(Icons.add_rounded,
-                          color: Colors.white, size: 18),
+                      icon: Icon(Icons.add_rounded,
+                          color: onSurface, size: 18),
                       onPressed: () {
                         addToCart(phone);
                       },
@@ -195,12 +196,14 @@ class CartScreen extends StatelessWidget {
   }
 
   Widget _buildCartFooter(BuildContext context, double subtotal) {
+    final theme = Theme.of(context);
+    final onSurface = theme.colorScheme.onSurface;
     return Container(
       padding: EdgeInsets.fromLTRB(
           20, 14, 20, MediaQuery.of(context).padding.bottom + 14),
       decoration: BoxDecoration(
-        color: _surface,
-        border: Border(top: BorderSide(color: Color.fromRGBO(255, 255, 255, 0.07))),
+        color: theme.cardColor,
+        border: Border(top: BorderSide(color: theme.dividerColor)),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -208,16 +211,16 @@ class CartScreen extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
+              Text(
                 'Subtotal',
                 style: TextStyle(
-                    color: Color.fromRGBO(255, 255, 255, 0.5),
+                    color: onSurface.withValues(alpha: 0.5),
                     fontSize: 14),
               ),
               Text(
                 '\$${subtotal.toStringAsFixed(0)}',
-                style: const TextStyle(
-                    color: Colors.white,
+                style: TextStyle(
+                    color: onSurface,
                     fontSize: 16,
                     fontWeight: FontWeight.w700),
               ),
@@ -227,10 +230,10 @@ class CartScreen extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
+              Text(
                 'Shipping',
                 style: TextStyle(
-                    color: Color.fromRGBO(255, 255, 255, 0.5),
+                    color: onSurface.withValues(alpha: 0.5),
                     fontSize: 14),
               ),
               Text(
@@ -243,15 +246,15 @@ class CartScreen extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 12),
-          const Divider(color: Colors.white12),
+          Divider(color: theme.dividerColor),
           const SizedBox(height: 12),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
+              Text(
                 'Total',
                 style: TextStyle(
-                    color: Colors.white,
+                    color: onSurface,
                     fontSize: 18,
                     fontWeight: FontWeight.w800),
               ),

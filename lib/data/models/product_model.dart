@@ -462,16 +462,21 @@ List<ProductModel> cartProducts() {
 // ── Compare state ────────────────────────────────────────────────────────────
 final ValueNotifier<Set<String>> compareIdsNotifier = ValueNotifier(<String>{});
 
+const int maxCompare = 3;
+
 bool isCompared(ProductModel product) {
   return compareIdsNotifier.value.contains(product.id);
 }
 
-void toggleCompare(ProductModel product) {
+/// Returns true if the product was added, false if removed or at limit.
+bool toggleCompare(ProductModel product) {
   final updated = Set<String>.from(compareIdsNotifier.value);
   if (!updated.remove(product.id)) {
+    if (updated.length >= maxCompare) return false;
     updated.add(product.id);
   }
   compareIdsNotifier.value = updated;
+  return true;
 }
 
 List<ProductModel> compareProducts() {

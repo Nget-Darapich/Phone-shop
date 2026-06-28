@@ -45,20 +45,47 @@ class CustomBottomNav extends StatelessWidget {
             ),
           ),
 
-          // Compare
-          IconButton(
-            onPressed: () {
-              Navigator.pushNamedAndRemoveUntil(context, AppRouter.compare, (route) => false);
-            },
-
-            icon: SvgPicture.asset(
-              "assets/icons/compare_icon.svg",
-              width: 20,
-              height: 20,
-              colorFilter: ColorFilter.mode(
-                selectedIndex == 1 ? Colors.cyan : Colors.grey,
-                BlendMode.srcIn,
-              ),
+          // Compare (with badge)
+          GestureDetector(
+            onTap: () => Navigator.pushNamedAndRemoveUntil(context, AppRouter.compare, (route) => false),
+            child: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: SvgPicture.asset(
+                    "assets/icons/compare_icon.svg",
+                    width: 20,
+                    height: 20,
+                    colorFilter: ColorFilter.mode(
+                      selectedIndex == 1 ? Colors.cyan : Colors.grey,
+                      BlendMode.srcIn,
+                    ),
+                  ),
+                ),
+                Positioned(
+                  right: 2,
+                  top: 2,
+                  child: ValueListenableBuilder<Set<String>>(
+                    valueListenable: compareIdsNotifier,
+                    builder: (context, compareIds, _) {
+                      final count = compareIds.length;
+                      if (count == 0) return const SizedBox.shrink();
+                      return Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: Colors.red,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          count.toString(),
+                          style: const TextStyle(color: Colors.white, fontSize: 10),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
             ),
           ),
 

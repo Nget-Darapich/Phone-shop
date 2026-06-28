@@ -21,6 +21,19 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
   static const _accent = Color(0xFF38BDF8);
 
+  void _showSnack(BuildContext context, String message, {Duration? duration, SnackBarAction? action}) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        duration: duration ?? const Duration(milliseconds: 900),
+        content: GestureDetector(
+          onTap: () => ScaffoldMessenger.of(context).clearSnackBars(),
+          child: Text(message),
+        ),
+        action: action,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final product = widget.product;
@@ -367,15 +380,23 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         Expanded(
                           child: OutlinedButton(
                             onPressed: () {
-                              toggleCompare(product);
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(isCompared
-                                      ? 'Removed from compare list'
-                                      : 'Added to compare list'),
-                                  duration: const Duration(milliseconds: 900),
-                                ),
-                              );
+                              if (!isCompared && compareIds.length >= maxCompare) {
+                                _showSnack(context, 'Compare list is full (max 4)',
+                                    duration: const Duration(milliseconds: 1200));
+                                return;
+                              }
+                              final added = toggleCompare(product);
+                              if (added) {
+                                _showSnack(context, 'Added to compare list',
+                                  action: SnackBarAction(
+                                    label: 'View',
+                                    onPressed: () => Navigator.pushNamedAndRemoveUntil(
+                                        context, AppRouter.compare, (route) => false),
+                                  ),
+                                );
+                              } else if (!isCompared) {
+                                _showSnack(context, 'Removed from compare list');
+                              }
                             },
                             style: OutlinedButton.styleFrom(
                               foregroundColor: onSurface,
@@ -396,16 +417,12 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                           child: ElevatedButton(
                             onPressed: () {
                               addToCart(product);
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(inCart
-                                      ? 'Added another item to cart'
-                                      : 'Added to cart'),
-                                  duration: const Duration(milliseconds: 900),
-                                  action: SnackBarAction(
-                                    label: 'View cart',
-                                    onPressed: () => Navigator.pushNamed(context, AppRouter.cart),
-                                  ),
+                              _showSnack(context, inCart
+                                  ? 'Added another item to cart'
+                                  : 'Added to cart',
+                                action: SnackBarAction(
+                                  label: 'View cart',
+                                  onPressed: () => Navigator.pushNamed(context, AppRouter.cart),
                                 ),
                               );
                             },

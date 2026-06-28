@@ -2,11 +2,10 @@ enum PaymentMethod { creditCard, applePay, localBank }
 
 enum LocalBank { aceleda, aba }
 
-class CheckoutModel {
+class CheckoutFormModel {
   final String fullName;
   final String streetAddress;
   final String city;
-  final String zip;
   final String telegram;
   final String phone;
   final PaymentMethod paymentMethod;
@@ -15,11 +14,10 @@ class CheckoutModel {
   final String cvc;
   final LocalBank localBank;
 
-  const CheckoutModel({
+  const CheckoutFormModel({
     this.fullName = '',
     this.streetAddress = '',
     this.city = '',
-    this.zip = '',
     this.telegram = '',
     this.phone = '',
     this.paymentMethod = PaymentMethod.creditCard,
@@ -29,11 +27,10 @@ class CheckoutModel {
     this.localBank = LocalBank.aceleda,
   });
 
-  CheckoutModel copyWith({
+  CheckoutFormModel copyWith({
     String? fullName,
     String? streetAddress,
     String? city,
-    String? zip,
     String? telegram,
     String? phone,
     PaymentMethod? paymentMethod,
@@ -42,11 +39,10 @@ class CheckoutModel {
     String? cvc,
     LocalBank? localBank,
   }) {
-    return CheckoutModel(
+    return CheckoutFormModel(
       fullName: fullName ?? this.fullName,
       streetAddress: streetAddress ?? this.streetAddress,
       city: city ?? this.city,
-      zip: zip ?? this.zip,
       telegram: telegram ?? this.telegram,
       phone: phone ?? this.phone,
       paymentMethod: paymentMethod ?? this.paymentMethod,
@@ -56,4 +52,35 @@ class CheckoutModel {
       localBank: localBank ?? this.localBank,
     );
   }
+
+  Map<String, dynamic> toJson() => {
+    'fullName': fullName,
+    'streetAddress': streetAddress,
+    'city': city,
+    'telegram': telegram,
+    'phone': phone,
+    'paymentMethod': paymentMethod.name,
+    'cardNumber': cardNumber,
+    'expiry': expiry,
+    'cvc': cvc,
+    'localBank': localBank.name,
+  };
+
+  factory CheckoutFormModel.fromJson(Map<String, dynamic> json) =>
+      CheckoutFormModel(
+        fullName: json['fullName'] as String? ?? '',
+        streetAddress: json['streetAddress'] as String? ?? '',
+        city: json['city'] as String? ?? '',
+        telegram: json['telegram'] as String? ?? '',
+        phone: json['phone'] as String? ?? '',
+        paymentMethod: PaymentMethod.values.firstWhere(
+            (e) => e.name == json['paymentMethod'],
+            orElse: () => PaymentMethod.creditCard),
+        cardNumber: json['cardNumber'] as String? ?? '',
+        expiry: json['expiry'] as String? ?? '',
+        cvc: json['cvc'] as String? ?? '',
+        localBank: LocalBank.values.firstWhere(
+            (e) => e.name == json['localBank'],
+            orElse: () => LocalBank.aceleda),
+      );
 }

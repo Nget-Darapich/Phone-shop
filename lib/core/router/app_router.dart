@@ -17,6 +17,7 @@ import 'package:phone_shop/features/product_list/screens/product_list_screen.dar
 import 'package:phone_shop/features/compare/screens/compare_screen.dart';
 import 'package:phone_shop/features/product/screens/product_detail_screen.dart';
 import 'package:phone_shop/features/checkout/screens/checkout_screen.dart';
+import 'package:phone_shop/features/orders/screens/orders_history_screen.dart';
 class AppRouter {
   static const String home = '/';
   static String product(String id) => '/product/$id';
@@ -38,6 +39,7 @@ class AppRouter {
   static const String bookAppointment = '/book_appointment';
   static const String supportChat = '/support_chat';
   static const String productList = '/product_list';
+  static const String ordersHistory = '/orders_history';
 
   /// All available route names in the app.
   static final Set<String> availableRoutes = {
@@ -59,6 +61,7 @@ class AppRouter {
     mediaReview,
     bookAppointment,
     supportChat,
+    ordersHistory,
   };
 
   static Route<dynamic> onGenerateRoute(RouteSettings settings) {
@@ -134,6 +137,12 @@ class AppRouter {
 
       case supportChat:
         return MaterialPageRoute(builder: (_) => const SupportChatScreen(), settings: settings);
+
+      case ordersHistory:
+        return MaterialPageRoute(
+          builder: (_) => const OrdersHistoryScreen(),
+          settings: settings,
+        );
 
       case productList:
         final filter = settings.arguments as ProductListFilter;

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/router/app_router.dart';
 import '../../../core/widgets/custom_bottom_nav.dart';
 import '../../../data/models/product_model.dart';
 
@@ -272,7 +273,8 @@ class CartScreen extends StatelessWidget {
             width: double.infinity,
             height: 56,
             child: ElevatedButton(
-              onPressed: () {},
+              onPressed: () => Navigator.pushNamed(
+                context, AppRouter.checkout, arguments: subtotal),
               style: ElevatedButton.styleFrom(
                 backgroundColor: _accent,
                 foregroundColor: const Color(0xFF020617),

@@ -47,6 +47,54 @@ class ProductModel {
     required this.monthlyDuration,
     this.isNew = false,
   });
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'name': name,
+    'brand': brand.name,
+    'category': category.name,
+    'image': image,
+    'price': price,
+    'rating': rating,
+    'reviewCount': reviewCount,
+    'isNew': isNew,
+    'colors': colors,
+    'storage': storage,
+    'description': description,
+    'displaySpec': displaySpec,
+    'cameraSpec': cameraSpec,
+    'processorSpec': processorSpec,
+    'batterySpec': batterySpec,
+    'connectivitySpec': connectivitySpec,
+    'monthlyPrice': monthlyPrice,
+    'monthlyDuration': monthlyDuration,
+  };
+
+  factory ProductModel.fromJson(Map<String, dynamic> json) => ProductModel(
+    id: json['id'] as String,
+    name: json['name'] as String,
+    brand: ProductBrand.values.firstWhere(
+        (e) => e.name == json['brand'],
+        orElse: () => ProductBrand.apple),
+    category: ProductCategory.values.firstWhere(
+        (e) => e.name == json['category'],
+        orElse: () => ProductCategory.phones),
+    image: json['image'] as String,
+    price: (json['price'] as num).toDouble(),
+    rating: (json['rating'] as num).toDouble(),
+    reviewCount: json['reviewCount'] as int,
+    isNew: json['isNew'] as bool? ?? false,
+    colors: (json['colors'] as List).cast<String>(),
+    storage: (json['storage'] as List).cast<String>(),
+    description: json['description'] as String,
+    displaySpec: json['displaySpec'] as String,
+    cameraSpec: json['cameraSpec'] as String,
+    processorSpec: json['processorSpec'] as String,
+    batterySpec: json['batterySpec'] as String,
+    connectivitySpec: json['connectivitySpec'] as String,
+    monthlyPrice: (json['monthlyPrice'] as num).toDouble(),
+    monthlyDuration: json['monthlyDuration'] as int,
+  );
 }
 
 // ── Sample data ──────────────────────────────────────────────────────────────

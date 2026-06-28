@@ -176,6 +176,12 @@ class MoreScreen extends StatelessWidget {
               ),
               _buildMenuItem(
                 context,
+                icon: Icons.receipt_long_rounded,
+                title: 'My Orders',
+                routeName: AppRouter.ordersHistory,
+              ),
+              _buildMenuItem(
+                context,
                 iconPath: 'assets/icons/Reviews_icon.png',
                 title: 'Reviews',
                 routeName: AppRouter.reviews,
@@ -188,9 +194,10 @@ class MoreScreen extends StatelessWidget {
   }
 
   Widget _buildMenuItem(BuildContext context, {
-    required String iconPath,
+    String? iconPath,
     required String title,
     String? routeName,
+    IconData? icon,
   }) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -202,14 +209,16 @@ class MoreScreen extends StatelessWidget {
         color: Colors.transparent,
         borderRadius: BorderRadius.circular(12),
         child: ListTile(
-          leading: Image.asset(
-            iconPath,
-            width: 24,
-            height: 24,
-            errorBuilder: (context, error, stackTrace) {
-              return Icon(Icons.error_outline, color: Theme.of(context).iconTheme.color);
-            },
-          ),
+          leading: icon != null
+              ? Icon(icon, size: 24, color: Theme.of(context).iconTheme.color)
+              : Image.asset(
+                  iconPath!,
+                  width: 24,
+                  height: 24,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Icon(Icons.error_outline, color: Theme.of(context).iconTheme.color);
+                  },
+                ),
           title: Text(
             title,
             style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color, fontSize: 16),

@@ -7,20 +7,22 @@ class ProductListScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final onSurface = theme.colorScheme.onSurface;
     final products = filter.apply(sampleProducts);
     return Scaffold(
-      backgroundColor: const Color(0xFF020617),
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF0F172A),
-        foregroundColor: Colors.white,
+        backgroundColor: theme.appBarTheme.backgroundColor ?? theme.canvasColor,
+        foregroundColor: theme.appBarTheme.foregroundColor ?? onSurface,
         elevation: 0,
         title: Text(
           filter.title,
-          style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w700),
+          style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
         ),
         centerTitle: false,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
+          icon: Icon(Icons.arrow_back_ios_new_rounded, size: 20, color: onSurface),
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
@@ -62,13 +64,16 @@ class _ProductGridCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final onSurface = theme.colorScheme.onSurface;
+    final primary = theme.colorScheme.primary;
     return GestureDetector(
       onTap: () => Navigator.pushNamed(context, '/product', arguments: product),
       child: Container(
         decoration: BoxDecoration(
-          color: const Color(0xFF0F172A),
+          color: theme.cardColor,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: const Color(0xFF1E293B), width: 1),
+          border: Border.all(color: theme.dividerColor, width: 1),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -78,12 +83,12 @@ class _ProductGridCard extends StatelessWidget {
                 borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
                 child: Container(
                   width: double.infinity,
-                  color: const Color(0xFF1E293B),
+                  color: theme.dividerColor,
                   child: Image.asset(
                     product.image,
                     fit: BoxFit.contain,
-                    errorBuilder: (_, _, _) => const Center(
-                      child: Icon(Icons.phone_android_rounded, color: Color(0xFF38BDF8), size: 52),
+                    errorBuilder: (_, _, _) => Center(
+                      child: Icon(Icons.phone_android_rounded, color: primary, size: 52),
                     ),
                   ),
                 ),
@@ -97,15 +102,15 @@ class _ProductGridCard extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF38BDF8).withValues(alpha: 0.12),
+                      color: primary.withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(6),
                     ),
                     child: Text(_brandName,
-                        style: const TextStyle(color: Color(0xFF38BDF8), fontSize: 10, fontWeight: FontWeight.w600)),
+                        style: TextStyle(color: primary, fontSize: 10, fontWeight: FontWeight.w600)),
                   ),
                   const SizedBox(height: 6),
                   Text(product.name,
-                      style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600),
+                      style: TextStyle(color: onSurface, fontSize: 13, fontWeight: FontWeight.w600),
                       maxLines: 2, overflow: TextOverflow.ellipsis),
                   const SizedBox(height: 4),
                   Row(
@@ -113,12 +118,12 @@ class _ProductGridCard extends StatelessWidget {
                       const Icon(Icons.star_rounded, color: Color(0xFFFBBF24), size: 13),
                       const SizedBox(width: 3),
                       Text('${product.rating}  (${product.reviewCount})',
-                          style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 11)),
+                          style: TextStyle(color: onSurface.withValues(alpha: 0.6), fontSize: 11)),
                     ],
                   ),
                   const SizedBox(height: 8),
                   Text('\$${product.price.toStringAsFixed(0)}',
-                      style: const TextStyle(color: Color(0xFF38BDF8), fontSize: 15, fontWeight: FontWeight.w700)),
+                      style: TextStyle(color: primary, fontSize: 15, fontWeight: FontWeight.w700)),
                 ],
               ),
             ),
@@ -135,17 +140,23 @@ class _EmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final onSurface = Theme.of(context).colorScheme.onSurface;
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(Icons.inventory_2_outlined, color: Color(0xFF334155), size: 72),
+          Icon(Icons.inventory_2_outlined,
+              color: onSurface.withValues(alpha: 0.3), size: 72),
           const SizedBox(height: 16),
           Text('No ${filter.title} found',
-              style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 16, fontWeight: FontWeight.w600)),
+              style: TextStyle(
+                  color: onSurface.withValues(alpha: 0.6),
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600)),
           const SizedBox(height: 8),
-          const Text('Check back later for new arrivals.',
-              style: TextStyle(color: Color(0xFF475569), fontSize: 13)),
+          Text('Check back later for new arrivals.',
+              style: TextStyle(
+                  color: onSurface.withValues(alpha: 0.5), fontSize: 13)),
         ],
       ),
     );

@@ -14,32 +14,7 @@ class CartScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: _bg,
-        elevation: 0,
-        leading: GestureDetector(
-          onTap: () => Navigator.pop(context),
-            child: Container(
-            margin: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: Color.fromRGBO(0, 0, 0, 0.35),
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(Icons.arrow_back_ios_new_rounded,
-                color: Colors.white, size: 18),
-          ),
-        ),
-        title: const Text(
-          'Shopping Cart',
-          style: TextStyle(
-              color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600),
-        ),
-        actions: [
-          _AppBarIcon(Icons.delete_outline_rounded, onTap: () {}),
-          _AppBarIcon(Icons.search_rounded, onTap: () {}),
-          _AppBarIcon(Icons.notifications_none_rounded, onTap: () {}),
-          _AppBarIcon(Icons.wb_sunny_outlined, onTap: () {}),
-          const SizedBox(width: 8),
-        ],
+        title: const Text('Shopping Cart'),
       ),
       bottomNavigationBar: const CustomBottomNav(selectedIndex: 3),
       body: ValueListenableBuilder<List<String>>(
@@ -313,24 +288,3 @@ class CartScreen extends StatelessWidget {
   }
 }
 
-class _AppBarIcon extends StatelessWidget {
-  final IconData icon;
-  final VoidCallback onTap;
-  const _AppBarIcon(this.icon, {required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
-        padding: const EdgeInsets.all(6),
-        decoration: BoxDecoration(
-          color: Color.fromRGBO(255, 255, 255, 0.08),
-          shape: BoxShape.circle,
-        ),
-        child: Icon(icon, color: Colors.white, size: 18),
-      ),
-    );
-  }
-}

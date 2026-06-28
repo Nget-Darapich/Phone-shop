@@ -19,14 +19,16 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   int _selectedColor = 0;
   int _selectedStorage = 0;
 
-  static const _bg = Color(0xFF020617);
-  static const _surface = Color(0xFF0F172A);
   static const _accent = Color(0xFF38BDF8);
 
   @override
   Widget build(BuildContext context) {
     final product = widget.product;
     final theme = Theme.of(context);
+    final onSurface = theme.colorScheme.onSurface;
+    final textTheme = theme.textTheme;
+    final divider = theme.dividerColor;
+    final card = theme.cardColor;
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -40,34 +42,25 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 // ── SliverAppBar with hero image ──────────────
                 SliverAppBar(
                   expandedHeight: 300,
-                  backgroundColor: _surface,
+                  backgroundColor: card,
                   pinned: true,
                   leading: GestureDetector(
                     onTap: () => Navigator.pop(context),
                     child: Container(
                       margin: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: Color.fromRGBO(0, 0, 0, 0.35),
+                        color: onSurface.withValues(alpha: 0.12),
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(Icons.arrow_back_ios_new_rounded,
-                          color: Colors.white, size: 18),
+                      child: Icon(Icons.arrow_back_ios_new_rounded,
+                          color: onSurface, size: 18),
                     ),
                   ),
-                  title: const Text(
+                  title: Text(
                     'Product Details',
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600),
+                    style: textTheme.titleMedium?.copyWith(color: onSurface),
                   ),
-                  actions: [
-                    _AppBarIcon(Icons.search_rounded, onTap: () {}),
-                    _AppBarIcon(Icons.notifications_none_rounded,
-                        onTap: () {}),
-                    _AppBarIcon(Icons.wb_sunny_outlined, onTap: () {}),
-                    const SizedBox(width: 8),
-                  ],
+                  actions: const [SizedBox(width: 8)],
                   flexibleSpace: FlexibleSpaceBar(
                     background: Stack(
                       fit: StackFit.expand,
@@ -76,9 +69,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                           product.image,
                           fit: BoxFit.cover,
                           errorBuilder: (_, _, _) => Container(
-                            color: _surface,
-                            child: const Icon(Icons.phone_android,
-                                size: 120, color: Color(0xFF334155)),
+                            color: card,
+                            child: Icon(Icons.phone_android,
+                                size: 120, color: onSurface.withValues(alpha: 0.3)),
                           ),
                         ),
                         // Gradient overlay so appbar blends
@@ -153,11 +146,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         // Product name
                         Text(
                           product.name,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 24,
-                            fontWeight: FontWeight.w800,
-                          ),
+                          style: textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w800),
                         ),
                         const SizedBox(height: 6),
 
@@ -218,10 +207,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         Container(
                           padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
-                            color: _surface,
+                            color: card,
                             borderRadius: BorderRadius.circular(14),
-                            border: Border.all(
-                              color: Color.fromRGBO(255, 255, 255, 0.07)),
+                            border: Border.all(color: divider),
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -246,11 +234,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                   Expanded(
                                     child: Text(
                                       '\$${product.price.toStringAsFixed(0)}',
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 26,
-                                        fontWeight: FontWeight.w900,
-                                      ),
+                                      style: textTheme.headlineLarge?.copyWith(fontWeight: FontWeight.w900),
                                     ),
                                   ),
                                   const SizedBox(width: 12),
@@ -258,7 +242,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                     child: Text(
                                       'or \$${product.monthlyPrice.toStringAsFixed(2)}/mo for ${product.monthlyDuration} mos.',
                                       style: TextStyle(
-                                        color: theme.colorScheme.onSurface.withValues(alpha: 0.65),
+                                        color: onSurface.withValues(alpha: 0.65),
                                         fontSize: 12,
                                       ),
                                       maxLines: 2,
@@ -276,10 +260,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         // ── Color selector ─────────────────────
                         Text(
                           'Color - ${product.colors[_selectedColor]}',
-                          style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 15,
-                              fontWeight: FontWeight.w600),
+                          style: textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600),
                         ),
                         const SizedBox(height: 12),
                         ColorSelector(
@@ -292,12 +273,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         const SizedBox(height: 24),
 
                         // ── Storage selector ───────────────────
-                        const Text(
+                        Text(
                           'Storage',
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 15,
-                              fontWeight: FontWeight.w600),
+                          style: textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600),
                         ),
                         const SizedBox(height: 12),
                         StorageSelector(
@@ -310,22 +288,22 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         const SizedBox(height: 24),
 
                         // ── Feature cards (warranty / delivery / return) ──
-                        Wrap(
-                          spacing: 10,
-                          runSpacing: 10,
+                        Row(
                           children: const [
-                            _FeatureCard(
+                            Expanded(child: _FeatureCard(
                               icon: Icons.verified_outlined,
                               label: '1 Year\nWarranty',
-                            ),
-                            _FeatureCard(
+                            )),
+                            SizedBox(width: 10),
+                            Expanded(child: _FeatureCard(
                               icon: Icons.local_shipping_outlined,
                               label: 'Free\nDelivery',
-                            ),
-                            _FeatureCard(
+                            )),
+                            SizedBox(width: 10),
+                            Expanded(child: _FeatureCard(
                               icon: Icons.replay_rounded,
                               label: '14 Days\nReturn',
-                            ),
+                            )),
                           ],
                         ),
 
@@ -373,8 +351,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     padding: EdgeInsets.fromLTRB(
                         20, 14, 20, MediaQuery.of(context).padding.bottom + 14),
                     decoration: BoxDecoration(
-                      color: _surface,
-                      border: Border(top: BorderSide(color: Color.fromRGBO(255, 255, 255, 0.07))),
+                      color: card,
+                      border: Border(top: BorderSide(color: divider)),
                     ),
                     child: Row(
                       children: [
@@ -392,8 +370,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                               );
                             },
                             style: OutlinedButton.styleFrom(
-                              foregroundColor: Colors.white,
-                              side: BorderSide(color: Color.fromRGBO(255, 255, 255, 0.2)),
+                              foregroundColor: onSurface,
+                              side: BorderSide(color: divider),
                               padding: const EdgeInsets.symmetric(vertical: 16),
                               shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(14)),
@@ -453,37 +431,15 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
 // ── Private helpers ─────────────────────────────────────────────────────────
 
-class _AppBarIcon extends StatelessWidget {
-  final IconData icon;
-  final VoidCallback onTap;
-  const _AppBarIcon(this.icon, {required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
-        padding: const EdgeInsets.all(6),
-        decoration: BoxDecoration(
-          color: Color.fromRGBO(255, 255, 255, 0.08),
-          shape: BoxShape.circle,
-        ),
-        child: Icon(icon, color: Colors.white, size: 18),
-      ),
-    );
-  }
-}
-
 class _RoundedActionButton extends StatelessWidget {
   final IconData icon;
-  final Color iconColor;
+  final Color? iconColor;
   final VoidCallback onTap;
 
   const _RoundedActionButton({
     required this.icon,
     required this.onTap,
-    this.iconColor = Colors.white,
+    this.iconColor,
   });
 
   @override
@@ -495,10 +451,10 @@ class _RoundedActionButton extends StatelessWidget {
         width: 38,
         height: 38,
         decoration: BoxDecoration(
-          color: Color.fromRGBO(0, 0, 0, 0.35),
+          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.12),
           shape: BoxShape.circle,
         ),
-        child: Icon(icon, color: iconColor, size: 20),
+        child: Icon(icon, color: iconColor ?? Theme.of(context).colorScheme.onSurface, size: 20),
       ),
     );
   }
@@ -512,22 +468,24 @@ class _InfoChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final onSurface = theme.colorScheme.onSurface;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
-        color: const Color(0xFF0F172A),
+        color: theme.cardColor,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Color.fromRGBO(255, 255, 255, 0.08)),
+        border: Border.all(color: theme.dividerColor),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, color: const Color(0xFF38BDF8), size: 16),
+          Icon(icon, color: theme.colorScheme.primary, size: 16),
           const SizedBox(width: 8),
           Text(
             label,
-            style: const TextStyle(
-              color: Colors.white70,
+            style: TextStyle(
+              color: onSurface.withValues(alpha: 0.7),
               fontSize: 12,
               fontWeight: FontWeight.w600,
             ),
@@ -546,28 +504,29 @@ class _FeatureCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 14),
-        decoration: BoxDecoration(
-          color: const Color(0xFF0F172A),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Color.fromRGBO(255, 255, 255, 0.07)),
-        ),
-        child: Column(
-          children: [
-            Icon(icon, color: const Color(0xFF38BDF8), size: 22),
-            const SizedBox(height: 6),
-            Text(
-              label,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Color.fromRGBO(255, 255, 255, 0.65),
-                fontSize: 11,
-                height: 1.4),
+    final theme = Theme.of(context);
+    final onSurface = theme.colorScheme.onSurface;
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 14),
+      decoration: BoxDecoration(
+        color: theme.cardColor,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: theme.dividerColor),
+      ),
+      child: Column(
+        children: [
+          Icon(icon, color: theme.colorScheme.primary, size: 22),
+          const SizedBox(height: 6),
+          Text(
+            label,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: onSurface.withValues(alpha: 0.65),
+              fontSize: 11,
+              height: 1.4,
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
